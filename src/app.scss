@@ -1,0 +1,30 @@
+@import './variables';
+
+@page { margin: 1cm } //Print options
+
+.App {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.app-body {
+  width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+.bold {
+  font-weight: bold;
+}
+.calTitleContainer {
+  display: flex;
+  justify-content: center;
+  width: 850px;
+  .calTitle {
+    text-align: center;
+    width: 400px;
+    margin-top: 30px;
+    margin-bottom: -50px;
+  }  
+}

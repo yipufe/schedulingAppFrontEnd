@@ -1,0 +1,13 @@
+@import '../../variables';
+
+.full-cal-cell-background {
+  width: 100%;
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(17, 59px);
+  background: lighten($coolGray, 15%);
+}
+.full-cal-cell {
+  background: white;
+}

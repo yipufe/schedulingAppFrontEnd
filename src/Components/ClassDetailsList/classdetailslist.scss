@@ -1,0 +1,43 @@
+@import '../../variables';
+
+.printOnly {
+    display: none;
+}
+.classDetailsList {
+    width: 850px;
+    margin-right: auto;
+    margin-left: auto;
+    border: 1px solid #eee;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+th {
+    background-color: #eee;
+    h1 {
+        margin-bottom: 0px;
+    }
+    h2 {
+        margin-top: 0px;
+        font-size: 24px;
+    }
+}
+.classDetailsListItem {
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    .classDetail {
+        margin-right: 15px;
+        .bold {
+            font-weight: bold;
+        }    
+    }
+}
+tr {
+    border: 1px solid black;
+}
+
+@media print {
+    .printOnly {
+        display: initial;
+    }
+}     

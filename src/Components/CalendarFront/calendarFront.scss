@@ -1,0 +1,185 @@
+@import '../../variables';
+
+.calendar-front {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(204, 5px);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.compare {
+  grid-template-columns: repeat(12, 1fr) !important;
+}
+
+.cal-front-item {
+  width: 85%;
+  background-color: #555;
+  color: white;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+}
+.cal-front-item-course {
+  margin: 0;
+  font-size: 9pt;
+  font-weight: 600;
+}
+.cal-front-item-p {
+  margin: 0;
+  font-size: 7.5pt;
+  font-weight: 500;
+}
+.course-modal {
+  width: 100vw;
+  border: none;
+  outline: none;
+  font-family: $Raleway;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // position: absolute;
+  // top: 40px;
+  // left: 40px;
+  // right: 40px;
+  // bottom: 40px;
+}
+
+.course-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.course-modal-wrap {
+  width: 45vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $gray;
+  z-index: inherit;
+  border-radius: 5px;
+  box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 1);
+  p {
+    color: white;
+  }
+}
+.modal-header {
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  h3 {
+    color: white;
+  }
+}
+.modal-close-x {
+  width: 30px;
+  height: 30px;
+  background: none;
+  color: white;
+  font-family: $Raleway;
+  font-size: 14pt;
+  cursor: pointer;
+  transition: ease-in-out 0.2s;
+  margin: 0;
+  &:hover {
+    color: darken(white, 10%);
+  }
+}
+.modal-body {
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-body-left {
+  width: 46%;
+  display: flex;
+  flex-direction: column;
+  label {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-size: 11pt;
+    margin-bottom: 15px;
+    input {
+      width: 100%;
+      height: 30px;
+      font-size: 12pt;
+      border-radius: 3px;
+      border: none;
+      padding: 5px 5px;
+    }
+  }
+}
+.modal-body-right {
+  width: 46%;
+  display: flex;
+  flex-direction: column;
+  label {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-size: 11pt;
+    margin-bottom: 15px;
+    input {
+      width: 100%;
+      height: 30px;
+      font-size: 12pt;
+      border-radius: 3px;
+      border: none;
+      padding: 5px 5px;
+    }
+  }
+}
+.modal-btns {
+  width: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.cancel-btn {
+  width: 120px;
+  height: 35px;
+  font-family: $Raj;
+  background: $gray;
+  transition: ease-in-out 0.2s;
+  cursor: pointer;
+  color: $darkGray;
+  &:hover {
+    background: darken($gray, 10%);
+  }
+}
+.save-btn {
+  width: 120px;
+  height: 35px;
+  font-family: $Raj;
+  background: $blue;
+  color: white;
+  margin-left: 20px;
+  transition: ease-in-out 0.2s;
+  cursor: pointer;
+  &:hover {
+    background: darken($blue, 10%);
+  }
+}
+
+@media print {
+  .calendar-front div {
+    color: #000;
+    background-color: #fff;
+    border: 1px solid black;
+  }
+}

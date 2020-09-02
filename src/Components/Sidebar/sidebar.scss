@@ -1,0 +1,125 @@
+@import '../../variables';
+
+.sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 50px;
+  h1 {
+    font-family: $Raj;
+    font-weight: 600;
+    font-size: 29px;
+    margin: 0;
+    margin-bottom: 10px;
+  }
+}
+.btns {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  h3 {
+    font-family: $Raj;
+  }
+}
+.upload-btn {
+  width: 100%;
+  height: 40px;
+  background: white;
+  border: solid 2px $green1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: ease-in-out 0.3s;
+  margin-bottom: 15px;
+  font-size: 12pt;
+  font-family: $Raj;
+  font-weight: 600;
+  // margin-top: 10px;
+  &:hover {
+    background: $green1;
+    color: white;
+  }
+}
+.print-btn {
+  width: 100%;
+  height: 50px;
+  background: white;
+  border: solid 2px $green1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: ease-in-out 0.3s;
+  margin-bottom: 15px;
+  font-size: 14pt;
+  font-family: $Raj;
+  font-weight: 600;
+  // margin-top: 10px;
+  &:hover {
+    background: $green1;
+    color: white;
+  }
+}
+.filters {
+  width: 100%;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: solid 1px gray;
+  border-radius: 10px;
+}
+.filter-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: $darkGray;
+  border-radius: 8px 8px 0px 0px;
+  h3 {
+    color: white;
+    font-size: 22px;
+  }
+}
+.clear-filters-btn {
+  width: 110px;
+  height: 40px;
+  color: $darkGray;
+  border: none;
+  border-radius: 12pc;
+  cursor: pointer;
+  transition: ease-in-out 0.2s;
+  font-size: 11pt;
+  font-family: $Raj;
+  font-weight: 600;
+  background: white;
+  &:hover {
+    background: $green3;
+    color: white;
+  }
+}
+.select {
+  width: 100%;
+  font-family: $Raleway;
+}
+.css-yk16xz-control {
+  border-radius: 0px !important;
+}
+
+.reset-calendar {
+  width: 100%;
+  height: 40px;
+  background: white;
+  border: solid 2px $red;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: ease-in-out 0.3s;
+  font-family: $Raj;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 15px;
+  &:hover {
+    background: $red;
+    color: white;
+  }
+}

@@ -1,0 +1,76 @@
+@import '../../variables';
+
+.footer-wrap {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-top {
+  width: 100%;
+  padding: 20px 0px;
+  background: linear-gradient(to bottom, #eaebec 0%, #ffffff 61%, #fbfbfb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  p {
+    margin: 0;
+    font-size: 11pt;
+  }
+}
+
+.footer-mid {
+  background: $green1;
+  width: 100%;
+  height: 270px;
+  padding: 20px 0px 40px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  div {
+    width: 310px;
+    padding: 0px 30px;
+    color: white;
+    h3 {
+      border-bottom: 1px solid white;
+      font-size: 18px;
+      padding-bottom: 10px;
+      font-family: $Raj;
+    }
+    p {
+      font-family: $Raleway;
+      font-size: 14px;
+    }
+  }
+}
+
+.footer-bottom {
+  background: #275037;
+  width: 100%;
+  height: 160px;
+  padding: 20px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  h3 {
+    margin: 0;
+    font-family: $Raj;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  p {
+    margin: 0;
+    font-size: 12px;
+  }
+}
+.social-icons {
+  margin-top: 20px;
+  img {
+    width: 30px;
+    height: 30px;
+    padding: 0px 15px;
+  }
+}
