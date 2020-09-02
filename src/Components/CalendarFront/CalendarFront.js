@@ -3,6 +3,7 @@ import './calendarFront.scss';
 import styled from 'styled-components';
 import { calDays, calDaysLeft, calDaysRight, calTimes, colors } from '../../calendarDaysAndTimesData';
 import { getTimeRange } from '../../time';
+import ReactTooltip from 'react-tooltip';
 
 const Container = styled.div`
   width: 85%;
@@ -49,6 +50,7 @@ function CalendarFront(props) {
     const timeSpan = getTimeRange( startTime, endTime);
 
     const displayEvents = dayArray.map((day) => {
+      const randValue = (Math.random()*100000)%10000;
       return (
         <Container
           key={`${day}-${event.classId}`}
@@ -60,6 +62,8 @@ function CalendarFront(props) {
           onClick={() => {
             props.openClassModal(event.classId);
           }}
+          data-tip
+          data-for={event.classId+randValue}
         >
           <p className="cal-front-item-course">
             {event.course}-{event.section}
@@ -75,7 +79,13 @@ function CalendarFront(props) {
           }
           
           { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
-          
+          <ReactTooltip delayShow={1000} id={event.classId+randValue}>
+            {event.course}-{event.section}
+            <br />
+            {event.courseTitle}
+            <br />
+            {event.meetingPattern}
+          </ReactTooltip>
         </Container>
       );
     });
@@ -101,6 +111,7 @@ function CalendarFront(props) {
     const timeSpan = getTimeRange( startTime, endTime);
 
     const displayEvents = dayArray.map((day) => {
+      const randValue = (Math.random()*100000)%10000;
       return (
         <div
           key={`${day}-${event.classId}`}
@@ -110,6 +121,8 @@ function CalendarFront(props) {
             gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
           }}
           className="cal-front-item"
+          data-tip
+          data-for={event.classId+randValue}
         >
           <p className="cal-front-item-course">
             {event.course}-{event.section}
@@ -119,7 +132,13 @@ function CalendarFront(props) {
           </p>
 
           { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
-        
+          <ReactTooltip delayShow={1000} id={event.classId+randValue}>
+            {event.course}-{event.section}
+            <br />
+            {event.courseTitle}
+            <br />
+            {event.meetingPattern}
+          </ReactTooltip>
         </div>
       );
     });

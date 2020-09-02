@@ -34,8 +34,20 @@ function Calendar(props) {
   return (
     <div className="calendar-wrap">
       <section className="calendar-header">
-      {/* {compareSchedule && <div className="comparison-legend"><div className="legend-left-container"><span className="legend-left">Left</span> - Original Schedule</div><div className="legend-right-container"><span className="legend-right">Right</span> - Modified Schedule</div></div> } */}
-      {!compareSchedule &&
+      {compareSchedule && <div className="comparison-legend"><div className="legend-left-container"><span className="legend-left">Left</span> - Original Schedule</div><div className="legend-right-container"><span className="legend-right">Right</span> - Modified Schedule</div></div> }
+      {compareSchedule&&
+          <div
+          className="calendar-header-icon-wrap"
+          onClick={()=>{setCompareSchedule(false)}}
+        >
+          <FontAwesomeIcon
+            icon={faArrowCircleLeft}
+            className="calendar-header-icon"
+            size="lg"
+          />
+          <p>Back</p>
+        </div>
+      }
         <div
           className="calendar-header-icon-wrap"
           onClick={() => setOpenAddClassModal(openAddClassModal ? false : true)}
@@ -47,19 +59,7 @@ function Calendar(props) {
           />
           <p>Add Class</p>
         </div>
-      }
-        {compareSchedule?
-          <div
-          className="calendar-header-icon-wrap"
-          onClick={()=>{setCompareSchedule(false)}}
-        >
-          <FontAwesomeIcon
-            icon={faArrowCircleLeft}
-            className="calendar-header-icon"
-            size="lg"
-          />
-          <p>Back</p>
-        </div>:
+      {!compareSchedule&&
           <div
           className="calendar-header-icon-wrap"
           onClick={()=>{setCompareSchedule(true)}}
@@ -72,7 +72,6 @@ function Calendar(props) {
           <p>Compare</p>
         </div>    
       }
-      {!compareSchedule &&
         <div className="calendar-header-icon-wrap" onClick={props.handlePrint}>
           <FontAwesomeIcon
             icon={faPrint}
@@ -81,7 +80,6 @@ function Calendar(props) {
           />
           <p>Print</p>
         </div>
-      }
       {!compareSchedule &&
         <div
           className="calendar-header-icon-wrap"
