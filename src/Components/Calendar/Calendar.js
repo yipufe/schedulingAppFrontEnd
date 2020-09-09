@@ -6,7 +6,7 @@ import {
   faPrint,
   faPlusCircle,
   faCheck,
-  faBalanceScale,
+  faClipboardList,
   faArrowCircleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
@@ -34,7 +34,16 @@ function Calendar(props) {
   return (
     <div className="calendar-wrap">
       <section className="calendar-header">
-      {compareSchedule && <div className="comparison-legend"><div className="legend-left-container"><span className="legend-left">Left</span> - Original Schedule</div><div className="legend-right-container"><span className="legend-right">Right</span> - Modified Schedule</div></div> }
+      {compareSchedule&&
+        <div className="comparison-legend">
+          <div className="legend-left-container">
+            <span className="legend-left">Left</span> - Original Schedule
+          </div>
+          <div className="legend-right-container">
+            <span className="legend-right">Right</span> - Changed Schedule
+          </div>
+        </div> 
+      }
       {compareSchedule&&
           <div
           className="calendar-header-icon-wrap"
@@ -65,11 +74,11 @@ function Calendar(props) {
           onClick={()=>{setCompareSchedule(true)}}
         >
           <FontAwesomeIcon
-            icon={faBalanceScale}
+            icon={faClipboardList}
             className="calendar-header-icon"
             size="lg"
           />
-          <p>Compare</p>
+          <p>Changes</p>
         </div>    
       }
         <div className="calendar-header-icon-wrap" onClick={props.handlePrint}>

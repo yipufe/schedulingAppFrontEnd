@@ -446,6 +446,7 @@ function App() {
     setDisplayData([]);
     setActiveFilter('');
     setInitialAndChangedData([]);
+    setInitialDataFiltered([]);
   };
 
   //Print handler

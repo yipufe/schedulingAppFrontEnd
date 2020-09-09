@@ -16,11 +16,12 @@
 
 .cal-front-item {
   width: 85%;
-  background-color: #555;
-  color: white;
+  // background-color: $babyBlue;
+  color: black;
   border-radius: 5px;
-  padding: 5px;
+  padding: 1px !important;
   cursor: pointer;
+  border: 4px dashed $blue;
 }
 .cal-front-item-course {
   margin: 0;

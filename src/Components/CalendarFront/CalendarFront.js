@@ -51,43 +51,89 @@ function CalendarFront(props) {
 
     const displayEvents = dayArray.map((day) => {
       const randValue = (Math.random()*100000)%10000;
-      return (
-        <Container
-          key={`${day}-${event.classId}`}
-          index={meetingPatternArr.indexOf(event)}
-          style={{
-            gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
-            gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
-          }}
-          onClick={() => {
-            props.openClassModal(event.classId);
-          }}
-          data-tip
-          data-for={event.classId+randValue}
-        >
-          <p className="cal-front-item-course">
-            {event.course}-{event.section}
-          </p>
-          {
-            !compareSchedule? 
-            <p className="cal-front-item-p">
-              {event.courseTitle.substring(0, 15) + '...'}
-            </p>:
-            <p className="cal-front-item-p">
-              {event.courseTitle.substring(0, 8) + '...'}
+      if(compareSchedule) {
+        if(meetingPatternArrOriginal.indexOf(event)===-1) {
+          return (
+            <Container
+              key={`${day}-${event.classId}`}
+              index={meetingPatternArr.indexOf(event)+10}
+              style={{
+                gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
+                gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
+              }}
+              onClick={() => {
+                props.openClassModal(event.classId);
+              }}
+              className="cal-front-item"
+              data-tip
+              data-for={event.classId+randValue}
+            >
+              <p className="cal-front-item-course">
+                {event.course}-{event.section}
+              </p>
+              {
+                !compareSchedule? 
+                <p className="cal-front-item-p">
+                  {event.courseTitle.substring(0, 15) + '...'}
+                </p>:
+                <p className="cal-front-item-p">
+                  {event.courseTitle.substring(0, 8) + '...'}
+                </p>
+              }
+              
+              { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+              <ReactTooltip delayShow={1000} id={event.classId+randValue}>
+                {event.course}-{event.section}
+                <br />
+                {event.courseTitle}
+                <br />
+                {event.meetingPattern}
+              </ReactTooltip>
+            </Container>
+          );    
+        } else {
+          return null;
+        }
+      } else {
+        return (
+          <Container
+            key={`${day}-${event.classId}`}
+            index={meetingPatternArr.indexOf(event)}
+            style={{
+              gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
+              gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
+            }}
+            onClick={() => {
+              props.openClassModal(event.classId);
+            }}
+            data-tip
+            data-for={event.classId+randValue}
+          >
+            <p className="cal-front-item-course">
+              {event.course}-{event.section}
             </p>
-          }
-          
-          { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
-          <ReactTooltip delayShow={1000} id={event.classId+randValue}>
-            {event.course}-{event.section}
-            <br />
-            {event.courseTitle}
-            <br />
-            {event.meetingPattern}
-          </ReactTooltip>
-        </Container>
-      );
+            {
+              !compareSchedule? 
+              <p className="cal-front-item-p">
+                {event.courseTitle.substring(0, 15) + '...'}
+              </p>:
+              <p className="cal-front-item-p">
+                {event.courseTitle.substring(0, 8) + '...'}
+              </p>
+            }
+            
+            { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+            <ReactTooltip delayShow={1000} id={event.classId+randValue}>
+              {event.course}-{event.section}
+              <br />
+              {event.courseTitle}
+              <br />
+              {event.meetingPattern}
+            </ReactTooltip>
+          </Container>
+        );  
+      }
+      
     });
 
     return displayEvents;
@@ -113,14 +159,13 @@ function CalendarFront(props) {
     const displayEvents = dayArray.map((day) => {
       const randValue = (Math.random()*100000)%10000;
       return (
-        <div
+        <Container
           key={`${day}-${event.classId}`}
-          index={meetingPatternArr.indexOf(event)}
+          index={meetingPatternArrOriginal.indexOf(event)}
           style={{
             gridColumn: `${calDaysLeft[day]}`,
             gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
           }}
-          className="cal-front-item"
           data-tip
           data-for={event.classId+randValue}
         >
@@ -139,7 +184,7 @@ function CalendarFront(props) {
             <br />
             {event.meetingPattern}
           </ReactTooltip>
-        </div>
+        </Container>
       );
     });
 
