@@ -14,15 +14,6 @@
   grid-template-columns: repeat(12, 1fr) !important;
 }
 
-.cal-front-item {
-  width: 85%;
-  // background-color: $babyBlue;
-  color: black;
-  border-radius: 5px;
-  padding: 1px !important;
-  cursor: pointer;
-  border: 4px dashed $blue;
-}
 .cal-front-item-course {
   margin: 0;
   font-size: 9pt;
@@ -182,5 +173,9 @@
     color: #000;
     background-color: #fff;
     border: 1px solid black;
+    padding: 4px;
+  }
+  .cal-front-item-change {
+    border: 2px dashed black !important;
   }
 }

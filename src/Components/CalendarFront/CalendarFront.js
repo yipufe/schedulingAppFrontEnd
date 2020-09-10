@@ -14,6 +14,16 @@ const Container = styled.div`
   cursor: pointer;
 `;
 
+const ContainerChange = styled.div`
+  width: 85%;
+  background-color: ${(props) => colors[props.index]};
+  color: black;
+  border-radius: 5px;
+  padding: 1px;
+  cursor: pointer;
+  border: 4px dashed #0095c8;
+`;
+
 function CalendarFront(props) {
   const { initialDataFiltered ,displayData, initialAndChangedData, compareSchedule } = props; // This is filtering through the displayData and filtering out all the data that say "Does Not Meet"
   let meetingPatternArr;
@@ -54,7 +64,7 @@ function CalendarFront(props) {
       if(compareSchedule) {
         if(meetingPatternArrOriginal.indexOf(event)===-1) {
           return (
-            <Container
+            <ContainerChange
               key={`${day}-${event.classId}`}
               index={meetingPatternArr.indexOf(event)+10}
               style={{
@@ -64,7 +74,7 @@ function CalendarFront(props) {
               onClick={() => {
                 props.openClassModal(event.classId);
               }}
-              className="cal-front-item"
+              className="cal-front-item-change"
               data-tip
               data-for={event.classId+randValue}
             >
@@ -89,7 +99,7 @@ function CalendarFront(props) {
                 <br />
                 {event.meetingPattern}
               </ReactTooltip>
-            </Container>
+            </ContainerChange>
           );    
         } else {
           return null;
