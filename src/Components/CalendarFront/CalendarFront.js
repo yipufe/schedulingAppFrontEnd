@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip';
 
 const Container = styled.div`
   width: 85%;
-  background-color: ${(props) => colors[props.index]};
+  background-color: ${(props) => colors[props.index]};  //color lookup
   color: black;
   border-radius: 5px;
   padding: 5px;
@@ -16,7 +16,7 @@ const Container = styled.div`
 
 const ContainerChange = styled.div`
   width: 85%;
-  background-color: ${(props) => colors[props.index]};
+  background-color: ${(props) => colors[props.index]};  //color lookup
   color: black;
   border-radius: 5px;
   padding: 1px;
@@ -38,11 +38,78 @@ function CalendarFront(props) {
     );
   }
 
+  //Filter original schedule removing classes that do not meet
   meetingPatternArrOriginal = initialDataFiltered.filter(
     (course) => course.meetingPattern !== 'Does Not Meet'
   );
 
-  const eventData = meetingPatternArr.map((event) => {
+  let colorsUsedOnOriginal = [];  //Array for keeping track of colors used in displaying original schedule
+  let lastColorIndex = 1; //Variable to keep track of current color index
+
+  const eventDataOriginal = meetingPatternArrOriginal.map((event,index) => {
+    colorsUsedOnOriginal.push({colorIndex: index, classId: event.classId});
+    lastColorIndex = index;
+
+    let days = event.meetingPattern.split(' ')[0];
+    days = days.replace('a', '');
+    let dayArray = days.split('');
+    dayArray = dayArray.map((day) => {
+      if (day === 'S') return 'Sa';
+      return day;
+    });
+
+    const startTime = event.meetingPattern.split(' ')[1].split('-')[0];
+    let endTime = event.meetingPattern.split(' ')[1].split('-')[1];
+    if (endTime.includes(';')) {
+      endTime = endTime.substring(0, endTime.length - 1);
+    }
+
+    const timeSpan = getTimeRange( startTime, endTime);
+
+    const displayEvents = dayArray.map((day) => {
+      const randValue = (Math.random()*100000)%10000;
+      return (
+        <Container
+          key={`${day}-${event.classId}`}
+          index={index}
+          style={{
+            gridColumn: `${calDaysLeft[day]}`,
+            gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
+          }}
+          data-tip
+          data-for={event.classId+randValue}
+        >
+          <p className="cal-front-item-course">
+            {event.course}-{event.section}
+          </p>
+          <p className="cal-front-item-p">
+            {event.courseTitle.substring(0, 8) + '...'}
+          </p>
+
+          { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+          <ReactTooltip delayShow={1000} id={event.classId+randValue}>
+            {event.course}-{event.section}
+            <br />
+            {event.courseTitle}
+            <br />
+            {event.meetingPattern}
+          </ReactTooltip>
+        </Container>
+      );
+    });
+
+    return displayEvents;
+  });
+
+
+  const eventData = meetingPatternArr.map((event, index) => {
+    const colorUsedOnOriginalIndex = colorsUsedOnOriginal.findIndex((element)=>element.classId===event.classId)
+    let colorIndex=1;
+    if(colorUsedOnOriginalIndex<0)
+      colorIndex=++lastColorIndex;  //if calendar item is not associated with and original calendar item and has no color, assign the next available one
+    else
+      colorIndex = colorsUsedOnOriginal[colorUsedOnOriginalIndex].colorIndex; //assign a color based on items original
+
     let days = event.meetingPattern.split(' ')[0];
     days = days.replace('a', '');
     let dayArray = days.split('');
@@ -66,7 +133,7 @@ function CalendarFront(props) {
           return (
             <ContainerChange
               key={`${day}-${event.classId}`}
-              index={meetingPatternArr.indexOf(event)+10}
+              index={colorIndex}
               style={{
                 gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
                 gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
@@ -108,7 +175,7 @@ function CalendarFront(props) {
         return (
           <Container
             key={`${day}-${event.classId}`}
-            index={meetingPatternArr.indexOf(event)}
+            index={index}
             style={{
               gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
               gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
@@ -144,58 +211,6 @@ function CalendarFront(props) {
         );  
       }
       
-    });
-
-    return displayEvents;
-  });
-
-  const eventDataOriginal = meetingPatternArrOriginal.map((event) => {
-    let days = event.meetingPattern.split(' ')[0];
-    days = days.replace('a', '');
-    let dayArray = days.split('');
-    dayArray = dayArray.map((day) => {
-      if (day === 'S') return 'Sa';
-      return day;
-    });
-
-    const startTime = event.meetingPattern.split(' ')[1].split('-')[0];
-    let endTime = event.meetingPattern.split(' ')[1].split('-')[1];
-    if (endTime.includes(';')) {
-      endTime = endTime.substring(0, endTime.length - 1);
-    }
-
-    const timeSpan = getTimeRange( startTime, endTime);
-
-    const displayEvents = dayArray.map((day) => {
-      const randValue = (Math.random()*100000)%10000;
-      return (
-        <Container
-          key={`${day}-${event.classId}`}
-          index={meetingPatternArrOriginal.indexOf(event)}
-          style={{
-            gridColumn: `${calDaysLeft[day]}`,
-            gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
-          }}
-          data-tip
-          data-for={event.classId+randValue}
-        >
-          <p className="cal-front-item-course">
-            {event.course}-{event.section}
-          </p>
-          <p className="cal-front-item-p">
-            {event.courseTitle.substring(0, 8) + '...'}
-          </p>
-
-          { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
-          <ReactTooltip delayShow={1000} id={event.classId+randValue}>
-            {event.course}-{event.section}
-            <br />
-            {event.courseTitle}
-            <br />
-            {event.meetingPattern}
-          </ReactTooltip>
-        </Container>
-      );
     });
 
     return displayEvents;
