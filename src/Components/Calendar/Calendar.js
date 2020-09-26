@@ -129,6 +129,8 @@ function Calendar(props) {
               setInitialAndChangedData={props.setInitialAndChangedData}
               openClassModal={props.openClassModal}
               compareSchedule={compareSchedule}
+              activeFilter={props.activeFilter}
+              collisions={props.collisions}
             />
           </div>
         </div>

@@ -8,6 +8,7 @@ import Footer from './Components/Footer/Footer';
 import { useReactToPrint } from 'react-to-print';
 import Printable from './Components/Print/printable';
 import ClassDetailsList from './Components/ClassDetailsList/classdetailslist';
+import {meetingPatternsOverlap} from './time'
 
 import Modal from 'react-modal';
 import ClassModal from './Components/ClassModal/classmodal';
@@ -31,7 +32,7 @@ function App() {
   const [block, setBlock] = useState([]);
   const [blockValue, setBlockValue] = useState([]);
   const [activeFilter, setActiveFilter] = useState('');
-
+  const [collisions, setCollisions] = useState([]);
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
 
@@ -127,7 +128,7 @@ function App() {
     e.preventDefault();
     const formData = new FormData();
     formData.append('csvfile', file);
-    let url = 'https://schedge.dev/calendar/postcsv'; //'https://schedge.dev/calendar/postcsv';
+    let url = 'https://schedge.dev/calendar/postcsv'; //'http://10.52.2.25:8080/calendar/postcsv'; 
     let method = 'POST';
 
     fetch(url, {
@@ -224,7 +225,7 @@ function App() {
     ev.preventDefault();
     const formData = new FormData();
     formData.append('displaydata', JSON.stringify(displayData));
-    let url = 'https://schedge.dev/export/postexcel';
+    let url = 'https://schedge.dev/export/postexcel';//'http://10.52.2.25:8080/export/postexcel';
     let method = 'POST';
 
     fetch(url, {
@@ -249,13 +250,52 @@ function App() {
       });
   };
 
+  const getCollisions = (compareItem, dataSet, filteredBy) => {
+    if(compareItem.meetingPattern === 'Does Not Meet')
+      return [];
+    let collisions = dataSet.filter((item)=>{
+      let overlaps = false;
+      if(compareItem[filteredBy] === item[filteredBy]) {
+        if(item.meetingPattern !== 'Does Not Meet') {
+          overlaps = meetingPatternsOverlap(compareItem.meetingPattern, item.meetingPattern)
+        }
+      }
+      return overlaps;
+    });
+    if(collisions.length <= 1)
+      return [];
+    collisions= collisions.map(collision=> {
+      collision.collisionAt = filteredBy;
+      return collision;
+    });
+    return JSON.parse( JSON.stringify( collisions ) );  //deep copy
+  }
+
   useEffect(() => {
     const roomArray = [];
     const instructorArray = [];
     const blockArray = [];
     const courseArray = [];
+    const collisionsArray = [];
     // This for loop loops through the dataArray and pushes the correct data into each of the different useState data arrays.
     for (let item of initialAndChangedData) {
+      
+      const courseCollision = getCollisions(item, initialAndChangedData, 'course');
+      if(courseCollision.length > 0)
+        collisionsArray.push( courseCollision );
+      
+      if(item.location !== "General Assignment Room") {
+        const locationCollision = getCollisions(item, initialAndChangedData, 'location');
+        if(locationCollision.length > 0)
+          collisionsArray.push( locationCollision );
+      }
+      
+      if(item.instructor !== "Staff [Primary, 100%]" ) {
+        const instructorCollision = getCollisions(item, initialAndChangedData, 'instructor')
+        if(instructorCollision.length > 0)
+          collisionsArray.push( instructorCollision );
+      }
+      
       if (roomArray.length <= 0) {
         const room = item.location.split(';')[0]; //Remove extra information after the semicolon
         roomArray.push(room);
@@ -344,7 +384,38 @@ function App() {
     setRoom(roomOptions);
     setInstructor(instructorOptions);
     setBlock(blockOptions);
+
+
+    //Remove duplicates from collisionsArray
+    const collisionsArrayTrimmed = collisionsArray.filter((collisionSet,index)=>{
+      return index === collisionsArray.findIndex(item=>{
+        return collisionSetsEquivalant(item, collisionSet);
+      });
+    });
+    setCollisions(collisionsArrayTrimmed);
   }, [initialAndChangedData]);
+
+  //true if collision sets are identicle
+  function collisionSetsEquivalant(set1,set2) {
+    let matchCount=0;
+    for(let i=0;i<set1.length;i++) {
+      for(let j=0;j<set2.length;j++) {
+        if(set1[i].classId === set2[j].classId && 
+            set1[i].classId !== undefined && 
+            set1[i].collisionAt === set2[j].collisionAt)
+          matchCount++;
+        else if(set1[i].course === set2[j].course &&
+          set1[i].courseTitle === set2[j].courseTitle &&
+          set1[i].instructor === set2[j].instructor && 
+          set1[i].room === set2[j].room &&
+          set1[i].meetingPattern === set2[j].meetingPattern &&
+          set1[i].collisionAt === set2[j].collisionAt) {
+            matchCount++;
+          }
+      }
+    }
+    return matchCount === set1.length;
+  }
 
   // Each of these handle change functions do the same thing for each filter and are for when the user selects something in the filters.
   // When a user selects something it filters through the specific filter data and sets the specific useState with the new filtered data.
@@ -498,6 +569,7 @@ function App() {
           setDisplayData={setDisplayData}
           setInitialData={setInitialData}
           handleResetCalendar={handleResetCalendar}
+          collisions={collisions}
         />
         <Printable ref={componentRef}>
           <div className="printOnly">
@@ -517,6 +589,8 @@ function App() {
             handlePrint={handlePrint}
             handleExcelExport={exportAsExcelFileHandler}
             openClassModal={openClassModal}
+            activeFilter={activeFilter}
+            collisions={collisions}
           />
           <ClassDetailsList displayData={displayData} title={activeFilter} />
         </Printable>
