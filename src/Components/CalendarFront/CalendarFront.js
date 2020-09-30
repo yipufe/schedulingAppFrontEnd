@@ -131,29 +131,101 @@ function CalendarFront(props) {
       return {days:dayIntersections, startTime, endTime, meetingPattern ,collision};
     });
 
-    /*
-    let lastLength = collisionSet.length+1;
-    while(collisionSet.length < lastLength) {
-      lastLength = collisionSet.length;
-      //Look for collisions of collisions
-      let skipIndexList = [];
-      // eslint-disable-next-line no-loop-func
-      collisionSet.forEach((col,index)=>{
-        if(collisionSet.length>1) {
-          for(let i=index+1;i<collisionSet.length;i++) {
-            if(skipIndexList.indexOf(i)>=0)
-              continue;
-            console.log("Meeting Patterns:", col.meetingPattern, collisionSet[i].meetingPattern, lastLength)
-          }
+
+    function getCollisions() {
+      const subCollisions = collisionSet
+      .map((obj1, idx, arr) => {
+        // Special case for last item; he's got no righthand neighbors, return empty result list
+        if (idx === arr.length - 1) return []
+    
+        // everything else:
+        return arr
+          // get all elements to the right in the list
+          .slice(idx + 1)
+          // find all of them that have a collision with obj1
+          .filter((obj2) => {
+            const overlap = meetingPatternsOverlap(obj1.meetingPattern, obj2.meetingPattern);
+            const contained = includes(obj1, obj2);       
+            return overlap && !contained;
+          })
+          // return objects representing collision pairs
+          .map((obj2) => ({ obj1, obj2 }))
+      })
+      // turn array of arrays of collision pairs into a single array
+      .reduce((accumulator, arr) => accumulator.concat(arr), [])
   
+      console.log(subCollisions);
+      let newCollisions = [];
+  
+      //Combine collisions
+      subCollisions.forEach(collision=>{
+        let startTime, endTime;
+        let newCollision = JSON.parse( JSON.stringify(collision.obj1) );
+  
+        //If start time from obj1 is less than start time from obj2 use obj1 start time otherwise use obj2 start time
+        if( getTimeValue(collision.obj1.startTime)<getTimeValue(collision.obj2.startTime) ) {
+          startTime = collision.obj1.startTime;
+        } else {
+          startTime = collision.obj2.startTime;
         }
-      });
-      //Remove merged collisions
-      collisionSet = collisionSet.filter((col,index)=>skipIndexList.indexOf(index)<0);
+        if( getTimeValue(collision.obj1.endTime)<getTimeValue(collision.obj2.endTime) ) {
+          endTime = collision.obj2.endTime;
+        } else {
+          endTime = collision.obj1.endTime;
+        }
+        newCollision.startTime = startTime;
+        newCollision.endTime = endTime;
+  
+        //TODO: Fix days
+        newCollision.days = collision.obj1.days;
+  
+        const days = newCollision.meetingPattern.split(' ')[0];
+        newCollision.meetingPattern = days+" "+startTime+"-"+endTime;
+  
+        //Add classes
+        const collisionsToAdd = collision.obj2.collision.filter((col1,index1,arr)=>{
+          if(-1 === newCollision.collision.findIndex((col2)=>{
+            return classesEqual(col1, col2);
+          }) ) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+        collisionsToAdd.forEach(col=>{
+          newCollision.collision.push(col);
+        })
+        
+  
+        newCollisions.push(newCollision);
+  
+      })
+      return newCollisions
     }
-    */
+
+    let lastCollisionSetLength = 0;
+    let cnt = 0;
+    while(lastCollisionSetLength<collisionSet.length && cnt++ < 2) {
+      lastCollisionSetLength = collisionSet.length;
+
+      const newSubCollisions = getCollisions();
+      console.log(collisionSet.length ,newSubCollisions );
+  
+      if(newSubCollisions.length>0) {
+        newSubCollisions.forEach(col=>{
+          //If col is unique to the collisionSet array, add it to the array
+          if(-1===collisionSet.findIndex(collision=>{
+            return JSON.stringify(collision) === JSON.stringify(col)
+          }))
+            collisionSet.push(col);
+        })
+      }
+
+    }
+
 
   }
+
 
   //Returns the earliest time in an array
   function getFirstTime(times) {
@@ -171,6 +243,35 @@ function CalendarFront(props) {
       lastTime = getTimeValue(lastTime)<getTimeValue(time)?time:lastTime;
     })
     return lastTime;
+  }
+
+  function includes(obj1, obj2) {
+    return isSuperset(obj1.collision, obj2.collision) || isSuperset(obj2.collision, obj1.collision);
+  }
+
+  function isSuperset(set, subset) {
+    for (let elem of subset) {
+        if (-1===set.findIndex( (elem2)=>classesEqual(elem, elem2) )) {
+            return false
+        }
+    }
+    return true
+  }
+
+  function classesEqual(c1, c2) {
+    if(c1.classId === c2.classId && 
+      c1.classId !== undefined && 
+      c2.classId !== undefined)
+      return true;
+    else if(c1.course === c2.course &&
+      c1.courseTitle === c2.courseTitle &&
+      c1.instructor === c2.instructor && 
+      c1.room === c2.room &&
+      c1.meetingPattern === c2.meetingPattern &&
+      c1.collisionAt === c2.collisionAt) {
+      return true;
+    }
+    return false;
   }
 
   const collisionsOutput = collisionSet.map((event, index) => {

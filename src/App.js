@@ -128,7 +128,7 @@ function App() {
     e.preventDefault();
     const formData = new FormData();
     formData.append('csvfile', file);
-    let url = 'https://schedge.dev/calendar/postcsv'; //'http://10.52.2.25:8080/calendar/postcsv'; 
+    let url = 'https://schedge.dev/calendar/postcsv'; //'http://10.52.2.25:8080/calendar/postcsv';
     let method = 'POST';
 
     fetch(url, {
@@ -225,7 +225,7 @@ function App() {
     ev.preventDefault();
     const formData = new FormData();
     formData.append('displaydata', JSON.stringify(displayData));
-    let url = 'https://schedge.dev/export/postexcel';//'http://10.52.2.25:8080/export/postexcel';
+    let url = 'https://schedge.dev/export/postexcel'; //'http://10.52.2.25:8080/export/postexcel';
     let method = 'POST';
 
     fetch(url, {
