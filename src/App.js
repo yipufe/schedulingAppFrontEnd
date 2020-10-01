@@ -250,9 +250,12 @@ function App() {
       });
   };
 
+  //Gets all collisions of calendar item
   const getCollisions = (compareItem, dataSet, filteredBy) => {
     if(compareItem.meetingPattern === 'Does Not Meet')
       return [];
+    
+    //get all collisions with compareItem
     let collisions = dataSet.filter((item)=>{
       let overlaps = false;
       if(compareItem[filteredBy] === item[filteredBy]) {
@@ -264,11 +267,12 @@ function App() {
     });
     if(collisions.length <= 1)
       return [];
+    //Include under what condition the collision occurred
     collisions= collisions.map(collision=> {
       collision.collisionAt = filteredBy;
       return collision;
     });
-    return JSON.parse( JSON.stringify( collisions ) );  //deep copy
+    return JSON.parse( JSON.stringify( collisions ) );  //deep copy, passes back a copy of the collisions
   }
 
   useEffect(() => {
@@ -280,16 +284,19 @@ function App() {
     // This for loop loops through the dataArray and pushes the correct data into each of the different useState data arrays.
     for (let item of initialAndChangedData) {
       
+      //Find collisions for courses
       const courseCollision = getCollisions(item, initialAndChangedData, 'course');
       if(courseCollision.length > 0)
         collisionsArray.push( courseCollision );
       
+      //Find collisions for locations
       if(item.location !== "General Assignment Room") {
         const locationCollision = getCollisions(item, initialAndChangedData, 'location');
         if(locationCollision.length > 0)
           collisionsArray.push( locationCollision );
       }
       
+      //Find collisions for instructors
       if(item.instructor !== "Staff [Primary, 100%]" ) {
         const instructorCollision = getCollisions(item, initialAndChangedData, 'instructor')
         if(instructorCollision.length > 0)

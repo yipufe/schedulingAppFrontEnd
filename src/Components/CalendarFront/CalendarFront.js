@@ -69,8 +69,8 @@ function CalendarFront(props) {
     let courseNumber, courseTitle;
     if(filterBy === 'course') {
       const filterValueArray = filterValue.split(' ');
-      courseNumber = filterValueArray.slice(0,2).join(' ');
-      courseTitle = filterValueArray.slice(2).join(' ');
+      courseNumber = filterValueArray.slice(0,2).join(' ');   //Get first two items in filterValueArray and join them together
+      courseTitle = filterValueArray.slice(2).join(' ');  //Get remaining item in filterValueArray and join them together
     }
 
     //Filter collisions based on filter selection
@@ -95,6 +95,7 @@ function CalendarFront(props) {
         meetingPatternsArray.push( item.meetingPattern );
       });
 
+      //Break meeting patterns into parts
       const meetingPatternPartsArray = meetingPatternsArray.map(meetingPattern=>{
         const [days, range] = meetingPattern.split(' ');
         const [startTime, endTime] = range.split('-');
@@ -115,17 +116,18 @@ function CalendarFront(props) {
         })
       }
       
+      //Get all start times
       const startTimes = meetingPatternPartsArray.map(part=>{
         return part.startTime;
       });
+      //Get all end times
       const endTimes = meetingPatternPartsArray.map(part=>{
         return part.endTime;
       });
-      const startTime = getFirstTime(startTimes);
-      const endTime = getLastTime(endTimes);      
+      const startTime = getFirstTime(startTimes); //find eariest time
+      const endTime = getLastTime(endTimes);      //find latest time
 
-      // console.log('Intersect pattern',dayIntersections, startTime+"-"+endTime);
-
+      //Reconstruct new meeting pattern
       const meetingPattern = dayIntersections.join('')+' '+startTime+'-'+endTime;
 
       return {days:dayIntersections, startTime, endTime, meetingPattern ,collision};
@@ -182,7 +184,7 @@ function CalendarFront(props) {
         const days = newCollision.meetingPattern.split(' ')[0];
         newCollision.meetingPattern = days+" "+startTime+"-"+endTime;
   
-        //Add classes
+        //Add collisions to collisions list
         const collisionsToAdd = collision.obj2.collision.filter((col1,index1,arr)=>{
           if(-1 === newCollision.collision.findIndex((col2)=>{
             return classesEqual(col1, col2);
@@ -205,11 +207,12 @@ function CalendarFront(props) {
 
     let lastCollisionSetLength = 0;
     let cnt = 0;
+    //Loop checking for collisions of collisions
     while(lastCollisionSetLength<collisionSet.length && cnt++ < 2) {
       lastCollisionSetLength = collisionSet.length;
 
       const newSubCollisions = getCollisions();
-      console.log(collisionSet.length ,newSubCollisions );
+      // console.log(collisionSet.length ,newSubCollisions );
   
       if(newSubCollisions.length>0) {
         newSubCollisions.forEach(col=>{
