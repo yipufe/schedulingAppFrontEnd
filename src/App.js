@@ -31,6 +31,7 @@ function App() {
   const [block, setBlock] = useState([]);
   const [blockValue, setBlockValue] = useState([]);
   const [activeFilter, setActiveFilter] = useState('');
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
@@ -215,6 +216,7 @@ function App() {
         setInitialDataFiltered(dataArray);
         setInitialAndChangedData(dataArray);
         setDisplayData(dataArray);
+        setFirstLoad(true);
       })
       .catch((err) => console.log(err));
   };
@@ -344,11 +346,17 @@ function App() {
     setRoom(roomOptions);
     setInstructor(instructorOptions);
     setBlock(blockOptions);
-  }, [initialAndChangedData]);
+    
+    if(firstLoad)   //if file is loaded in clear filters which sets the course filter to a default course
+      clearFilters();
+    setFirstLoad( false );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialAndChangedData, firstLoad]);
 
   // Each of these handle change functions do the same thing for each filter and are for when the user selects something in the filters.
   // When a user selects something it filters through the specific filter data and sets the specific useState with the new filtered data.
-  // Each function also resets the other filters back to 0.
+  // Each function also resets the other filters back to 0.  
   const handleBlockChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
     const blockFilteredData = initialAndChangedData.filter(
@@ -431,6 +439,10 @@ function App() {
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
     setActiveFilter('');
+
+    //Filter default
+    if(course.length > 0)
+      handleCourseChange(course[0]);  //Set course filter to first course in course list
   };
   const handleResetCalendar = () => {
     setFile('');
