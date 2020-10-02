@@ -38,7 +38,7 @@ function CalendarFront(props) {
   const { initialDataFiltered ,displayData, initialAndChangedData, compareSchedule } = props; // This is filtering through the displayData and filtering out all the data that say "Does Not Meet"
   let meetingPatternArr;
   let meetingPatternArrOriginal;
-  let collisionSet;
+  let collisionSet = [];
 
   if (displayData) {
     meetingPatternArr = displayData.filter(
@@ -58,9 +58,58 @@ function CalendarFront(props) {
   let colorsUsedOnOriginal = [];  //Array for keeping track of colors used in displaying original schedule
   let lastColorIndex = 1; //Variable to keep track of current color index
 
+    //**********************************START OVERLAP ****************/
+
+    let overlap = [];
+    meetingPatternArr.forEach((calItem,i,calItemArr)=>{
+      const arrCopy = JSON.parse(JSON.stringify(calItemArr));
+      arrCopy.splice(i,1); //Remove calItem from array
+      const days = calItem.meetingPattern.split(' ')[0].split('');  //split meetingPattern days up
+      //Iterate through each day looking for overlap
+      days.forEach((day)=>{
+        const callItemCopy = JSON.parse(JSON.stringify(calItem));
+        callItemCopy.meetingPattern = day+' '+callItemCopy.meetingPattern.split(' ')[1];
+        overlap.push( getOverlap([callItemCopy], arrCopy) )
+      })
+    })
+
+    console.log("Overlap:",overlap);    
+    //Todo: Remove duplacates
+
+    //Todo: build meeting patterns for overlaping sets
+
+    //item: [{meetingPattern,...}, {meetingPattern,...}, ...]
+    function getOverlap(item, arr) {
+      let newItem = JSON.parse(JSON.stringify(item)); //Deep copy item
+      const meetingPatternDay = item[0].meetingPattern.split(' ')[0]; //Get first item meeting pattern day and use that
+      let arrCopy = JSON.parse(JSON.stringify(arr));
+
+      newItem.forEach(item1=>{
+        for(let index2=0;index2<arrCopy.length;index2++) {
+          const item2 = arrCopy[index2];
+          if( meetingPatternsOverlap(item1.meetingPattern, item2.meetingPattern) ) {
+            item2.meetingPattern = meetingPatternDay+' '+item2.meetingPattern.split(' ')[1];  //change meeting pattern to have the day being evaluated
+            //assign to item array
+            newItem.push(item2);
+            //trim collision item from arr
+            arrCopy.splice(index2,1);
+            break;
+          }
+        }
+      })
+
+      if(item.length === newItem.length) {
+        return newItem;
+      }
+
+      return getOverlap(newItem, arrCopy);
+    }
 
 
 
+
+    //***********************************END OVERLAP ******************/
+/*
 
   if(props.activeFilter !== undefined) {
     let [filterBy, filterValue] = props.activeFilter.split(': ');
@@ -228,7 +277,7 @@ function CalendarFront(props) {
 
 
   }
-
+*/
 
   //Returns the earliest time in an array
   function getFirstTime(times) {
