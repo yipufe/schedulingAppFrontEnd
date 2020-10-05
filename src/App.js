@@ -597,7 +597,6 @@ function App() {
             handleExcelExport={exportAsExcelFileHandler}
             openClassModal={openClassModal}
             activeFilter={activeFilter}
-            collisions={collisions}
           />
           <ClassDetailsList displayData={displayData} title={activeFilter} />
         </Printable>

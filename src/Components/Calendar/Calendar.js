@@ -130,7 +130,6 @@ function Calendar(props) {
               openClassModal={props.openClassModal}
               compareSchedule={compareSchedule}
               activeFilter={props.activeFilter}
-              collisions={props.collisions}
             />
           </div>
         </div>
