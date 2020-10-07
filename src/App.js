@@ -441,8 +441,8 @@ function App() {
     setActiveFilter('');
 
     //Filter default
-    if(course.length > 0)
-      handleCourseChange(course[0]);  //Set course filter to first course in course list
+    if(room.length > 0)
+      handleRoomChange(room[0]);  //Set room filter to first room in room list
   };
   const handleResetCalendar = () => {
     setFile('');
