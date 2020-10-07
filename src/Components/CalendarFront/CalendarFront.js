@@ -69,7 +69,7 @@ function CalendarFront(props) {
       //Iterate through each day looking for overlap
       days.forEach((day)=>{
         const callItemCopy = JSON.parse(JSON.stringify(calItem));
-        callItemCopy.meetingPattern = day+' '+callItemCopy.meetingPattern.split(' ')[1];
+        callItemCopy.meetingPatternTemp = day+' '+callItemCopy.meetingPattern.split(' ')[1];
         overlap.push( getOverlap([callItemCopy], arrCopy) )
       })
     })
@@ -94,7 +94,7 @@ function CalendarFront(props) {
     let times = [];
     let day = '';
     item.forEach(calItem=>{
-      const [dayValue,timeSpan] = calItem.meetingPattern.split(' ');
+      const [dayValue,timeSpan] = calItem.meetingPatternTemp.split(' ');
       const [startTime,endTime] = timeSpan.split('-');
       times.push(startTime);
       times.push(endTime);
@@ -148,14 +148,14 @@ function CalendarFront(props) {
   //item: [{meetingPattern,...}, {meetingPattern,...}, ...]
   function getOverlap(item, arr) {
     let newItem = JSON.parse(JSON.stringify(item)); //Deep copy item
-    const meetingPatternDay = item[0].meetingPattern.split(' ')[0]; //Get first item meeting pattern day and use that
+    const meetingPatternDay = item[0].meetingPatternTemp.split(' ')[0]; //Get first item meeting pattern day and use that
     let arrCopy = JSON.parse(JSON.stringify(arr));
 
     newItem.forEach(item1=>{
       for(let index2=0;index2<arrCopy.length;index2++) {
         const item2 = arrCopy[index2];
-        if( meetingPatternsOverlap(item1.meetingPattern, item2.meetingPattern) ) {
-          item2.meetingPattern = meetingPatternDay+' '+item2.meetingPattern.split(' ')[1];  //change meeting pattern to have the day being evaluated
+        if( meetingPatternsOverlap(item1.meetingPatternTemp, item2.meetingPattern) ) {
+          item2.meetingPatternTemp = meetingPatternDay+' '+item2.meetingPattern.split(' ')[1];  //change meeting pattern to have the day being evaluated
           //assign to item array
           newItem.push(item2);
           //trim collision item from arr
@@ -184,19 +184,31 @@ function CalendarFront(props) {
           >
           {
             event.items.map(cl=>{
+              tooltipIndex++;
               return (
                 <div 
                   className="subclass"
                   onClick={() => {
                     props.openClassModal(cl.classId);
                   }}
-                  >
+                  data-tip
+                  data-for={"tooltip_"+tooltipIndex}
+                >
                   <p className="cal-front-item-course">
                     {cl.course}-{cl.section}
                   </p>
                   <p className="cal-front-item-p">
                     {cl.courseTitle.substring(0, 8) + '...'}
                   </p>
+                  <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
+                    {cl.course}-{cl.section}
+                    <br />
+                    {cl.courseTitle}
+                    <br />
+                    {cl.instructor}
+                    <br />
+                    {cl.meetingPattern}
+                  </ReactTooltip>
                 </div>
               );
             })
@@ -213,19 +225,31 @@ function CalendarFront(props) {
           >
           {
             event.items.map(cl=>{
+              tooltipIndex++;
               return (
                 <div 
                 className="subclass"
                   onClick={() => {
                     props.openClassModal(cl.classId);
                   }}
-                  >
+                  data-tip
+                  data-for={"tooltip_"+tooltipIndex}
+                >
                   <p className="cal-front-item-course">
                     {cl.course}-{cl.section}
                   </p>
                   <p className="cal-front-item-p">
                     {cl.courseTitle.substring(0, 15) + '...'}
                   </p>
+                  <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
+                    {cl.course}-{cl.section}
+                    <br />
+                    {cl.courseTitle}
+                    <br />
+                    {cl.instructor}
+                    <br />
+                    {cl.meetingPattern}
+                  </ReactTooltip>
                 </div>
               );
             })
