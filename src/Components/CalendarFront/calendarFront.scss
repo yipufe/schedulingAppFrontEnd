@@ -179,3 +179,10 @@
     border: 2px dashed black !important;
   }
 }
+.subclass {
+  margin-bottom: 4px;
+  &:hover {
+    background-color: $darkRed;
+    color: white;
+  }
+}
