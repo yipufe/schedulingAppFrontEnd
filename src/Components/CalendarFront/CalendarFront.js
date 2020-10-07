@@ -57,20 +57,23 @@ function CalendarFront(props) {
   let colorsUsedOnOriginal = [];  //Array for keeping track of colors used in displaying original schedule
   let lastColorIndex = 1; //Variable to keep track of current color index
   let tooltipIndex = 1000;
+  let maxCalItems = 50; //Keeps the overlap visualization from trying to process more than this number of items
 
   //OVERLAP section
   let overlap = [];
-  meetingPatternArr.forEach((calItem,i,calItemArr)=>{
-    const arrCopy = JSON.parse(JSON.stringify(calItemArr));
-    arrCopy.splice(i,1); //Remove calItem from array
-    const days = calItem.meetingPattern.split(' ')[0].split('');  //split meetingPattern days up
-    //Iterate through each day looking for overlap
-    days.forEach((day)=>{
-      const callItemCopy = JSON.parse(JSON.stringify(calItem));
-      callItemCopy.meetingPattern = day+' '+callItemCopy.meetingPattern.split(' ')[1];
-      overlap.push( getOverlap([callItemCopy], arrCopy) )
+  if(meetingPatternArr.length < maxCalItems) {  //Don't run if items exceeds maxCalItems
+    meetingPatternArr.forEach((calItem,i,calItemArr)=>{
+      const arrCopy = JSON.parse(JSON.stringify(calItemArr));
+      arrCopy.splice(i,1); //Remove calItem from array
+      const days = calItem.meetingPattern.split(' ')[0].split('');  //split meetingPattern days up
+      //Iterate through each day looking for overlap
+      days.forEach((day)=>{
+        const callItemCopy = JSON.parse(JSON.stringify(calItem));
+        callItemCopy.meetingPattern = day+' '+callItemCopy.meetingPattern.split(' ')[1];
+        overlap.push( getOverlap([callItemCopy], arrCopy) )
+      })
     })
-  })
+  }
 
   overlap = overlap.filter(item=>item.length > 1);  //Remove non-overlapping
 
