@@ -57,7 +57,7 @@ function CalendarFront(props) {
   let colorsUsedOnOriginal = [];  //Array for keeping track of colors used in displaying original schedule
   let lastColorIndex = 1; //Variable to keep track of current color index
   let tooltipIndex = 1000;
-  let maxCalItems = 50; //Keeps the overlap visualization from trying to process more than this number of items
+  let maxCalItems = 50; //Keeps the app from trying to process all of the data on load by limiting the number of items
 
   //OVERLAP section
   let overlap = [];
@@ -236,97 +236,142 @@ function CalendarFront(props) {
 
   });
 
+  if(meetingPatternArr.length < maxCalItems) {  //If items to display exceeds maxCalItems, don't display them
+    
+    const eventDataOriginal = meetingPatternArrOriginal.map((event,index) => {
+      colorsUsedOnOriginal.push({colorIndex: index, classId: event.classId});
+      lastColorIndex = index;
   
-  const eventDataOriginal = meetingPatternArrOriginal.map((event,index) => {
-    colorsUsedOnOriginal.push({colorIndex: index, classId: event.classId});
-    lastColorIndex = index;
-
-    let days = event.meetingPattern.split(' ')[0];
-    days = days.replace('a', '');
-    let dayArray = days.split('');
-    dayArray = dayArray.map((day) => {
-      if (day === 'S') return 'Sa';
-      return day;
+      let days = event.meetingPattern.split(' ')[0];
+      days = days.replace('a', '');
+      let dayArray = days.split('');
+      dayArray = dayArray.map((day) => {
+        if (day === 'S') return 'Sa';
+        return day;
+      });
+  
+      const startTime = event.meetingPattern.split(' ')[1].split('-')[0];
+      let endTime = event.meetingPattern.split(' ')[1].split('-')[1];
+      if (endTime.includes(';')) {
+        endTime = endTime.substring(0, endTime.length - 1);
+      }
+  
+      const timeSpan = getTimeRange( startTime, endTime);
+  
+      const displayEvents = dayArray.map((day) => {
+        tooltipIndex++;
+        return (
+          <Container
+            key={`${day}-${event.classId}`}
+            index={index}
+            style={{
+              gridColumn: `${calDaysLeft[day]}`,
+              gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
+            }}
+            data-tip
+            data-for={"tooltip_"+tooltipIndex}
+          >
+            <p className="cal-front-item-course">
+              {event.course}-{event.section}
+            </p>
+            <p className="cal-front-item-p">
+              {event.courseTitle.substring(0, 8) + '...'}
+            </p>
+  
+            { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+            <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
+              {event.course}-{event.section}
+              <br />
+              {event.courseTitle}
+              <br />
+              {event.instructor}
+              <br />
+              {event.meetingPattern}
+            </ReactTooltip>
+          </Container>
+        );
+      });
+  
+      return displayEvents;
     });
-
-    const startTime = event.meetingPattern.split(' ')[1].split('-')[0];
-    let endTime = event.meetingPattern.split(' ')[1].split('-')[1];
-    if (endTime.includes(';')) {
-      endTime = endTime.substring(0, endTime.length - 1);
-    }
-
-    const timeSpan = getTimeRange( startTime, endTime);
-
-    const displayEvents = dayArray.map((day) => {
-      tooltipIndex++;
-      return (
-        <Container
-          key={`${day}-${event.classId}`}
-          index={index}
-          style={{
-            gridColumn: `${calDaysLeft[day]}`,
-            gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
-          }}
-          data-tip
-          data-for={"tooltip_"+tooltipIndex}
-        >
-          <p className="cal-front-item-course">
-            {event.course}-{event.section}
-          </p>
-          <p className="cal-front-item-p">
-            {event.courseTitle.substring(0, 8) + '...'}
-          </p>
-
-          { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
-          <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
-            {event.course}-{event.section}
-            <br />
-            {event.courseTitle}
-            <br />
-            {event.instructor}
-            <br />
-            {event.meetingPattern}
-          </ReactTooltip>
-        </Container>
-      );
-    });
-
-    return displayEvents;
-  });
-
-
-  const eventData = meetingPatternArr.map((event, index) => {
-    const colorUsedOnOriginalIndex = colorsUsedOnOriginal.findIndex((element)=>element.classId===event.classId)
-    let colorIndex=1;
-    if(colorUsedOnOriginalIndex<0)
-      colorIndex=++lastColorIndex;  //if calendar item is not associated with and original calendar item and has no color, assign the next available one
-    else
-      colorIndex = colorsUsedOnOriginal[colorUsedOnOriginalIndex].colorIndex; //assign a color based on items original
-
-    let days = event.meetingPattern.split(' ')[0];
-    days = days.replace('a', '');
-    let dayArray = days.split('');
-    dayArray = dayArray.map((day) => {
-      if (day === 'S') return 'Sa';
-      return day;
-    });
-
-    const startTime = event.meetingPattern.split(' ')[1].split('-')[0];
-    let endTime = event.meetingPattern.split(' ')[1].split('-')[1];
-    if (endTime.includes(';')) {
-      endTime = endTime.substring(0, endTime.length - 1);
-    }
-
-    const timeSpan = getTimeRange( startTime, endTime);
-
-    const displayEvents = dayArray.map((day) => {
-      tooltipIndex++;
-      if(compareSchedule) {
-        if(meetingPatternArrOriginal.indexOf(event)===-1) {
+  
+  
+    const eventData = meetingPatternArr.map((event, index) => {
+      const colorUsedOnOriginalIndex = colorsUsedOnOriginal.findIndex((element)=>element.classId===event.classId)
+      let colorIndex=1;
+      if(colorUsedOnOriginalIndex<0)
+        colorIndex=++lastColorIndex;  //if calendar item is not associated with and original calendar item and has no color, assign the next available one
+      else
+        colorIndex = colorsUsedOnOriginal[colorUsedOnOriginalIndex].colorIndex; //assign a color based on items original
+  
+      let days = event.meetingPattern.split(' ')[0];
+      days = days.replace('a', '');
+      let dayArray = days.split('');
+      dayArray = dayArray.map((day) => {
+        if (day === 'S') return 'Sa';
+        return day;
+      });
+  
+      const startTime = event.meetingPattern.split(' ')[1].split('-')[0];
+      let endTime = event.meetingPattern.split(' ')[1].split('-')[1];
+      if (endTime.includes(';')) {
+        endTime = endTime.substring(0, endTime.length - 1);
+      }
+  
+      const timeSpan = getTimeRange( startTime, endTime);
+  
+      const displayEvents = dayArray.map((day) => {
+        tooltipIndex++;
+        if(compareSchedule) {
+          if(meetingPatternArrOriginal.indexOf(event)===-1) {
+            return (
+              <ContainerChange
+                key={`${day}-${event.classId}`}
+                index={colorIndex}
+                style={{
+                  gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
+                  gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
+                }}
+                onClick={() => {
+                  props.openClassModal(event.classId);
+                }}
+                className="cal-front-item-change"
+                data-tip
+                data-for={"tooltip_"+tooltipIndex}
+              >
+                <p className="cal-front-item-course">
+                  {event.course}-{event.section}
+                </p>
+                {
+                  !compareSchedule? 
+                  <p className="cal-front-item-p">
+                    {event.courseTitle.substring(0, 15) + '...'}
+                  </p>:
+                  <p className="cal-front-item-p">
+                    {event.courseTitle.substring(0, 8) + '...'}
+                  </p>
+                }
+                
+                { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+                <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
+                  {event.course}-{event.section}
+                  <br />
+                  {event.courseTitle}
+                  <br />
+                  {event.instructor}
+                  <br />
+                  {event.meetingPattern}
+                </ReactTooltip>
+              </ContainerChange>
+            );    
+          } else {
+            return null;
+          }
+        } else {
           return (
-            <ContainerChange
+            <Container
               key={`${day}-${event.classId}`}
-              index={colorIndex}
+              index={index}
               style={{
                 gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
                 gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
@@ -334,7 +379,6 @@ function CalendarFront(props) {
               onClick={() => {
                 props.openClassModal(event.classId);
               }}
-              className="cal-front-item-change"
               data-tip
               data-for={"tooltip_"+tooltipIndex}
             >
@@ -361,63 +405,25 @@ function CalendarFront(props) {
                 <br />
                 {event.meetingPattern}
               </ReactTooltip>
-            </ContainerChange>
-          );    
-        } else {
-          return null;
+            </Container>
+          );  
         }
-      } else {
-        return (
-          <Container
-            key={`${day}-${event.classId}`}
-            index={index}
-            style={{
-              gridColumn: compareSchedule?`${calDaysRight[day]}`:`${calDays[day]}`,
-              gridRow: `${calTimes[startTime]} / ${calTimes[endTime]}`,
-            }}
-            onClick={() => {
-              props.openClassModal(event.classId);
-            }}
-            data-tip
-            data-for={"tooltip_"+tooltipIndex}
-          >
-            <p className="cal-front-item-course">
-              {event.course}-{event.section}
-            </p>
-            {
-              !compareSchedule? 
-              <p className="cal-front-item-p">
-                {event.courseTitle.substring(0, 15) + '...'}
-              </p>:
-              <p className="cal-front-item-p">
-                {event.courseTitle.substring(0, 8) + '...'}
-              </p>
-            }
-            
-            { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
-            <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
-              {event.course}-{event.section}
-              <br />
-              {event.courseTitle}
-              <br />
-              {event.instructor}
-              <br />
-              {event.meetingPattern}
-            </ReactTooltip>
-          </Container>
-        );  
-      }
-      
+        
+      });
+  
+      return displayEvents;
     });
 
-    return displayEvents;
-  });
 
-  if(compareSchedule) {
-    return <div className="calendar-front compare">{eventData.concat(eventDataOriginal).concat(collisionsOutput)}</div>;
-  } else {
-    return <div className="calendar-front">{eventData.concat(collisionsOutput)}</div>;
-  }
+    if(compareSchedule) {
+      return <div className="calendar-front compare">{eventData.concat(eventDataOriginal).concat(collisionsOutput)}</div>;
+    } else {
+      return <div className="calendar-front">{eventData.concat(collisionsOutput)}</div>;
+    }
+
+  }//end if
+
+  return <div className="calendar-front"></div>;
 
 }
 
