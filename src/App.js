@@ -292,7 +292,7 @@ function App() {
         collisionsArray.push( courseCollision );
       
       //Find collisions for locations
-      if(item.location !== "General Assignment Room") {
+      if(item.location !== "General Assignment Room" && item.location !== "LIVE STREAM" && item.location !== "General Assignment Room; ONLINE ONLINE") {
         const locationCollision = getCollisions(item, initialAndChangedData, 'location');
         if(locationCollision.length > 0)
           collisionsArray.push( locationCollision );
