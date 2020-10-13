@@ -611,7 +611,11 @@ function App() {
             openClassModal={openClassModal}
             activeFilter={activeFilter}
           />
-          <ClassDetailsList displayData={displayData} title={activeFilter} />
+          <ClassDetailsList 
+            displayData={displayData} 
+            title={activeFilter}
+            openClassModal={openClassModal}
+          />
         </Printable>
       </div>
       <Footer />
