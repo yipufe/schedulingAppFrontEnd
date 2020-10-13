@@ -117,9 +117,20 @@ function App() {
 
   // This function is for when the user uploads a file it stores the file in the file state.
   const handleChange = (e) => {
-    const file = e.target.files[0]; // accessing file
-    setFile(file); // storing file
+    if(e.target.files.length > 0) {
+      const file = e.target.files[0]; // accessing file
+      setFile(file); // storing file
+    }
   };
+
+  //File reader with promise
+  function promiseFileReader(file){
+    return new Promise(res => {
+      var fileReader = new FileReader();  
+      fileReader.onload = res;
+      fileReader.readAsText(file);
+    });
+  }
 
   /*
     This function is the main function that actually uploads the file to the server,
@@ -127,99 +138,117 @@ function App() {
   */
   const csvFileHandler = (e) => {
     e.preventDefault();
+    
+    //Checks to see if a file was selected and is available for processing.
+    if(file === '') {
+      alert('No file selected!');
+      return;
+    }
+    
     const formData = new FormData();
-    formData.append('csvfile', file);
-    let url = 'https://schedge.dev/calendar/postcsv'; //'http://10.52.2.25:8080/calendar/postcsv';
-    let method = 'POST';
+    
+    const fileNameParts = file.name.split('.'); //Split file name at period
+    let extension = '';
+    if(fileNameParts.length > 1) {  //if file name contains no extention this will be false
+      extension = fileNameParts[fileNameParts.length-1];
+      if(extension==="sched") { //If file type is *.sched
+        promiseFileReader(file).then(e=>{ //Parse file as text
+          const sessionFromFile = JSON.parse(e.target.result);  //Convert to JSON obj
 
-    fetch(url, {
-      method: method,
-      body: formData,
-    })
-      .then((res) => {
-        if (res.status !== 200) {
-          throw new Error('Uploading file failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        console.log(resData);
-        // These are all the empty arrays that will be filled with data after filtering through the resData.
-        const dataArray = [];
-        // This for loop is for filtering through the data and getting rid of all the heading rows and columns in the csv file.
-        for (let item of resData) {
-          if (item.field2 && item.field2 !== 'CLSS ID') {
-            // This pushes the classes into the dataArray state.
-            dataArray.push({
-              block: item.field19,
-              campus: item.field21,
-              classId: item.field2,
-              course: item.field9,
-              courseAttributes: item.field30,
-              courseTitle: item.field11,
-              creditHours: item.field27,
-              gradeMode: item.field28,
-              instructionMethod: item.field22,
-              instructor: item.field16.split(' (')[0],
-              location: item.field17,
-              maxEnrollment: item.field33,
-              maxWaitlistEnrollment: item.field36,
-              meetingPattern: item.field14,
-              scheduleType: item.field12,
-              section: item.field10,
-              sectionAttributes: item.field29,
-              sectionComments: item.field44,
-              sectionText: item.field46,
-              session: item.field20,
-              specialApproval: item.field25,
-              status: item.field18,
-              visible: item.field24,
-            });
-          }
-        }
-        //time and instructor schedule
-        const filterArray = [];
-        var uniqueObj = [];
-        var bool = true;
-        dataArray.forEach((data) => {
-          if (
-            !filterArray.find(
-              (dat) =>
-                dat.instructor === data.instructor &&
-                dat.course === data.course &&
-                dat.meetingPattern === data.meetingPattern
-            )
-          ) {
-            const { instructor, course, meetingPattern } = data;
-            filterArray.push({ instructor, course, meetingPattern });
-          }
-        });
+          if(sessionFromFile.initialData !== undefined &&   //Check for objects within
+              sessionFromFile.initialDataFiltered !== undefined &&
+              sessionFromFile.initialAndChangedData !== undefined &&
+              sessionFromFile.displayData !== undefined &&
+              sessionFromFile.courseValue !== undefined &&
+              sessionFromFile.roomValue !== undefined &&
+              sessionFromFile.instructorValue !== undefined &&
+              sessionFromFile.blockValue !== undefined &&
+              sessionFromFile.activeFilter !== undefined) {
+            //populate values with contents
+            setInitialData(sessionFromFile.initialData);
+            setInitialDataFiltered(sessionFromFile.initialDataFiltered);
+            setInitialAndChangedData(sessionFromFile.initialAndChangedData);
+            setDisplayData(sessionFromFile.displayData);
 
-        for (var i = 0; i < filterArray.length; i++) {
-          if (
-            uniqueObj.indexOf(filterArray[i].instructor) === -1 &&
-            uniqueObj.indexOf(filterArray[i].course) === -1 &&
-            uniqueObj.indexOf(filterArray[i].meetingPattern) === -1
-          ) {
-            bool = true;
+            setCourseValue(sessionFromFile.courseValue);
+            setRoomValue(sessionFromFile.roomValue);
+            setInstructorValue(sessionFromFile.instructorValue);
+            setBlockValue(sessionFromFile.blockValue);
+            setActiveFilter(sessionFromFile.activeFilter);
           } else {
-            bool = false;
+            alert("Couldn't read file!")
           }
-        }
-        if (bool === true) {
-          alert('No schedule intersects');
-        } else {
-          alert('schedule intersects');
-          return;
-        }
-        console.log(dataArray);
-        setInitialData(dataArray);
-        setInitialDataFiltered(dataArray);
-        setInitialAndChangedData(dataArray);
-        setDisplayData(dataArray);
-        setFirstLoad(true);
-      })
-      .catch((err) => console.log(err));
+
+        })    
+      } else if(extension==="csv") {  //If file type is *.csv
+
+
+        formData.append('csvfile', file);
+        let url = 'https://schedge.dev/calendar/postcsv'; //'http://10.52.2.25:8080/calendar/postcsv';
+        let method = 'POST';
+    
+        fetch(url, {
+          method: method,
+          body: formData,
+        })
+          .then((res) => {
+            if (res.status !== 200) {
+              throw new Error('Uploading file failed!');
+            }
+            return res.json();
+          })
+          .then((resData) => {
+            
+            // These are all the empty arrays that will be filled with data after filtering through the resData.
+            const dataArray = [];
+            // This for loop is for filtering through the data and getting rid of all the heading rows and columns in the csv file.
+            for (let item of resData) {
+              if (item.field2 && item.field2 !== 'CLSS ID') {
+                // This pushes the classes into the dataArray state.
+                dataArray.push({
+                  block: item.field19,
+                  campus: item.field21,
+                  classId: item.field2,
+                  course: item.field9,
+                  courseAttributes: item.field30,
+                  courseTitle: item.field11,
+                  creditHours: item.field27,
+                  gradeMode: item.field28,
+                  instructionMethod: item.field22,
+                  instructor: item.field16.split(' (')[0],
+                  location: item.field17,
+                  maxEnrollment: item.field33,
+                  maxWaitlistEnrollment: item.field36,
+                  meetingPattern: item.field14,
+                  scheduleType: item.field12,
+                  section: item.field10,
+                  sectionAttributes: item.field29,
+                  sectionComments: item.field44,
+                  sectionText: item.field46,
+                  session: item.field20,
+                  specialApproval: item.field25,
+                  status: item.field18,
+                  visible: item.field24,
+                });
+              }
+            }
+            setInitialData(dataArray);
+            setInitialDataFiltered(dataArray);
+            setInitialAndChangedData(dataArray);
+            setDisplayData(dataArray);
+            setFirstLoad(true);
+          })
+          .catch((err) => console.log(err));
+    
+
+      } else {  //if file type is not supported
+        console.log("File type unsupported!");
+      }
+    } else {  //if file type is not given
+      console.log("File type unsupported!");
+    }
+
+
   };
 
   //export to excel file and start download
@@ -251,6 +280,33 @@ function App() {
         downloadLink.click();
       });
   };
+
+  //Saves session to file and auto downloads the file
+  const saveSession = () => {
+    const session = {
+      initialData,
+      initialDataFiltered,
+      initialAndChangedData,
+      displayData,
+
+      courseValue,
+      roomValue,
+      instructorValue,
+      blockValue,
+      activeFilter,
+    }
+
+    //Create new file with session data as contents
+    const file = new File([JSON.stringify(session)], 'Session.sched', {
+      type: 'text/plain'
+    });
+    const downloadLink = document.createElement('a'); //create download link
+    const url = window.URL.createObjectURL(file);
+    downloadLink.href = url;  //set file as download content
+    downloadLink.download = 'Session.sched';  //call the file Session.sched
+    downloadLink.click(); //Start download
+
+  }
 
   //Gets all collisions of calendar item
   const getCollisions = (compareItem, dataSet, filteredBy) => {
@@ -610,6 +666,7 @@ function App() {
             handleExcelExport={exportAsExcelFileHandler}
             openClassModal={openClassModal}
             activeFilter={activeFilter}
+            saveSession={saveSession}
           />
           <ClassDetailsList displayData={displayData} title={activeFilter} />
         </Printable>

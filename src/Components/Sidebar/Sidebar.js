@@ -30,7 +30,7 @@ function Sidebar(props) {
           onClick={props.fileHandler}
           className="upload-btn"
         >
-          IMPORT CALENDAR FILE
+          LOAD CALENDAR FILE
         </button>
       </div>
       <div className="filters">

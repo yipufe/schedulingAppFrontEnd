@@ -8,6 +8,7 @@ import {
   faCheck,
   faClipboardList,
   faArrowCircleLeft,
+  faFileDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import AddClass from '../AddClass/AddClass';
@@ -102,6 +103,18 @@ function Calendar(props) {
           <p>Export</p>
         </div>
       }
+        <div
+          className="calendar-header-icon-wrap"
+          onClick={props.saveSession}
+        >
+          <FontAwesomeIcon
+            icon={faFileDownload}
+            className="calendar-header-icon"
+            size="lg"
+          />
+          <p>Save</p>
+        </div>
+
       </section>
       <div className="calendar">
         <div className="dayname-row">

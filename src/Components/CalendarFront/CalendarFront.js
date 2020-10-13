@@ -347,7 +347,8 @@ function CalendarFront(props) {
       const displayEvents = dayArray.map((day) => {
         tooltipIndex++;
         if(compareSchedule) {
-          if(meetingPatternArrOriginal.indexOf(event)===-1) {
+          // if(meetingPatternArrOriginal.indexOf(event)===-1) {
+          if(meetingPatternArrOriginal.findIndex(item=>isSameCalItem(item,event))===-1) {
             return (
               <ContainerChange
                 key={`${day}-${event.classId}`}
