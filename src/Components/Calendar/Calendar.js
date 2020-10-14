@@ -25,6 +25,21 @@ function Calendar(props) {
   const [addClassSuccess, setAddClassSuccess] = useState(false);
   const [compareSchedule, setCompareSchedule] = useState(false);
 
+
+  //Determin whether to show calendar grid or not
+  const displayCap = 50;
+  let filteredDisplayData = [];
+  if (props.displayData) {
+    filteredDisplayData = props.displayData.filter(
+      (course) => course.meetingPattern !== 'Does Not Meet'
+    );
+  } else {
+    filteredDisplayData = props.initialAndChangedData.filter(
+      (course) => course.meetingPattern !== 'Does Not Meet'
+    );
+  }
+  let showCalendar = !(filteredDisplayData.length===0 && props.displayData.length>0) && props.displayData.length<displayCap;
+
   const handleAddClass = (e) => {
     setAddClassData({
       ...addClassData,
@@ -69,7 +84,7 @@ function Calendar(props) {
           />
           <p>Add Class</p>
         </div>
-      {!compareSchedule&&
+      {(!compareSchedule&&showCalendar)&&
           <div
           className="calendar-header-icon-wrap"
           onClick={()=>{setCompareSchedule(true)}}
@@ -90,7 +105,7 @@ function Calendar(props) {
           />
           <p>Print</p>
         </div>
-      {!compareSchedule &&
+      {(!compareSchedule&&showCalendar) &&
         <div
           className="calendar-header-icon-wrap"
           onClick={props.handleExcelExport}
@@ -116,37 +131,39 @@ function Calendar(props) {
         </div>
 
       </section>
-      <div className="calendar">
-        <div className="dayname-row">
-          <div className="dayname-left"></div>
-          <div className="dayname-wrap">
-            <div className="dayname">Monday</div>
-            <div className="dayname">Tuesday</div>
-            <div className="dayname">Wednesday</div>
-            <div className="dayname">Thursday</div>
-            <div className="dayname">Friday</div>
-            <div className="dayname">Saturday</div>
+      {showCalendar &&          
+        <div className="calendar">
+          <div className="dayname-row">
+            <div className="dayname-left"></div>
+            <div className="dayname-wrap">
+              <div className="dayname">Monday</div>
+              <div className="dayname">Tuesday</div>
+              <div className="dayname">Wednesday</div>
+              <div className="dayname">Thursday</div>
+              <div className="dayname">Friday</div>
+              <div className="dayname">Saturday</div>
+            </div>
+          </div>
+          <div className="full-cal">
+            <CalendarTimes />
+            <div className="full-cal-body">
+              <CalendarCells />
+              <CalendarFront
+                initialData={props.initialData}
+                initialDataFiltered={props.initialDataFiltered}
+                setInitialData={props.setInitialData}
+                displayData={props.displayData}
+                setDisplayData={props.setDisplayData}
+                initialAndChangedData={props.initialAndChangedData}
+                setInitialAndChangedData={props.setInitialAndChangedData}
+                openClassModal={props.openClassModal}
+                compareSchedule={compareSchedule}
+                activeFilter={props.activeFilter}
+              />
+            </div>
           </div>
         </div>
-        <div className="full-cal">
-          <CalendarTimes />
-          <div className="full-cal-body">
-            <CalendarCells />
-            <CalendarFront
-              initialData={props.initialData}
-              initialDataFiltered={props.initialDataFiltered}
-              setInitialData={props.setInitialData}
-              displayData={props.displayData}
-              setDisplayData={props.setDisplayData}
-              initialAndChangedData={props.initialAndChangedData}
-              setInitialAndChangedData={props.setInitialAndChangedData}
-              openClassModal={props.openClassModal}
-              compareSchedule={compareSchedule}
-              activeFilter={props.activeFilter}
-            />
-          </div>
-        </div>
-      </div>
+      }
       {/* ** MODAL ***/}
       <Modal
         isOpen={openAddClassModal}

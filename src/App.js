@@ -668,7 +668,11 @@ function App() {
             activeFilter={activeFilter}
             saveSession={saveSession}
           />
-          <ClassDetailsList displayData={displayData} title={activeFilter} />
+          <ClassDetailsList 
+            displayData={displayData} 
+            title={activeFilter}
+            openClassModal={openClassModal}
+          />
         </Printable>
       </div>
       <Footer />
