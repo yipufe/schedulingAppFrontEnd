@@ -185,6 +185,8 @@ function Calendar(props) {
             initialAndChangedData={props.initialAndChangedData}
             setInitialAndChangedData={props.setInitialAndChangedData}
             setAddClassSuccess={setAddClassSuccess}
+            setUniqueId={props.setUniqueId}
+            uniqueId={props.uniqueId}
           />
         ) : (
           <div

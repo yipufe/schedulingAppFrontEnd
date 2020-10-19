@@ -36,6 +36,8 @@ function App() {
   const [collisions, setCollisions] = useState([]);
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
+  const [uniqueId, setUniqueId] = useState(0);
+  
 
   function changeClassModalMeetingPattern(pattern) {
     const newClassModalData = { ...classModalData };
@@ -667,6 +669,8 @@ function App() {
             openClassModal={openClassModal}
             activeFilter={activeFilter}
             saveSession={saveSession}
+            setUniqueId={setUniqueId}
+            uniqueId={uniqueId}
           />
           <ClassDetailsList 
             displayData={displayData} 
