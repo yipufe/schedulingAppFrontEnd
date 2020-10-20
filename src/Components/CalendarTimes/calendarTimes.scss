@@ -5,7 +5,7 @@
   display: grid;
   gap: 1px;
   grid-template-columns: repeat(1, 1fr);
-  grid-template-rows: repeat(17, 59px);
+  grid-template-rows: repeat(15, 59px);
   background: lighten($coolGray, 15%);
   border-top: 1px solid lighten($coolGray, 15%);
   border-right: 1px solid lighten($coolGray, 15%);
