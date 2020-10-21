@@ -31,7 +31,8 @@ function App() {
   const [instructorValue, setInstructorValue] = useState([]);
   const [block, setBlock] = useState([]);
   const [blockValue, setBlockValue] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('');
+  const [activeFilter, setActiveFilter] = useState({});
+  const [activeFilterText, setActiveFilterText] = useState('');
   const [firstLoad, setFirstLoad] = useState(true);
   const [collisions, setCollisions] = useState([]);
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
@@ -177,6 +178,7 @@ function App() {
             setInstructorValue(sessionFromFile.instructorValue);
             setBlockValue(sessionFromFile.blockValue);
             setActiveFilter(sessionFromFile.activeFilter);
+            setActiveFilterText(sessionFromFile.activeFilter.filter+': '+sessionFromFile.activeFilter.options.label);
           } else {
             alert("Couldn't read file!")
           }
@@ -462,9 +464,28 @@ function App() {
     setCollisions(collisionsArrayTrimmed);
     
 
-    if(firstLoad)   //if file is loaded in clear filters which sets the course filter to a default course
+    if(firstLoad) {  //if file is loaded in clear filters which sets the course filter to a default course
       clearFilters();
-    setFirstLoad( false );
+      setFirstLoad( false );
+    } else {
+      //Redisplay data
+      switch(activeFilter.filter) {
+        case('Block'):
+          handleBlockChange(activeFilter.options);
+          break;
+        case('Instructor'):
+          handleInstructorChange(activeFilter.options);
+          break;
+        case('Room'):
+          handleRoomChange(activeFilter.options);
+          break;
+        case('Course'):
+          handleCourseChange(activeFilter.options);
+          break;
+        default:
+      }
+      
+    }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialAndChangedData, firstLoad]);
@@ -508,7 +529,8 @@ function App() {
     setCourseValue({ label: 'Filter Course...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setRoomValue({ label: 'Filter Room...', value: 0 });
-    setActiveFilter('Block: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Block'});
+    setActiveFilterText('Block: '+ selectedOption.label);
   };
   const handleInstructorChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
@@ -525,7 +547,8 @@ function App() {
     setCourseValue({ label: 'Filter Course...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
     setRoomValue({ label: 'Filter Room...', value: 0 });
-    setActiveFilter('Instructor: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Instructor'});
+    setActiveFilterText('Instructor: '+ selectedOption.label);
   };
   const handleRoomChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
@@ -549,7 +572,8 @@ function App() {
     setCourseValue({ label: 'Filter Course...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
-    setActiveFilter('Room: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Room'});
+    setActiveFilterText('Room: '+ selectedOption.label);
   };
   const handleCourseChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
@@ -565,7 +589,8 @@ function App() {
     setRoomValue({ label: 'Filter Room...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
-    setActiveFilter('Course: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Course'});
+    setActiveFilterText('Course: '+ selectedOption.label);
   };
 
   const clearFilters = () => {
@@ -575,7 +600,7 @@ function App() {
     setRoomValue({ label: 'Filter Room...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
-    setActiveFilter('');
+    setActiveFilter({});
 
     //Filter default
     if(room.length > 0)
@@ -593,7 +618,7 @@ function App() {
     setRoomValue([]);
     setInitialData([]);
     setDisplayData([]);
-    setActiveFilter('');
+    setActiveFilter({});
     setInitialAndChangedData([]);
     setInitialDataFiltered([]);
   };
@@ -652,7 +677,7 @@ function App() {
         <Printable ref={componentRef}>
           <div className="printOnly">
             <div className="calTitleContainer">
-              <div className="calTitle bold">{activeFilter}</div>
+              <div className="calTitle bold">{activeFilterText}</div>}
             </div>
           </div>
           <Calendar
@@ -671,10 +696,15 @@ function App() {
             saveSession={saveSession}
             setUniqueId={setUniqueId}
             uniqueId={uniqueId}
+            handleBlockChange={handleBlockChange}
+            handleInstructorChange={handleInstructorChange}
+            handleRoomChange={handleRoomChange}
+            handleCourseChange={handleCourseChange}
+            clearFilters={clearFilters}
           />
           <ClassDetailsList 
             displayData={displayData} 
-            title={activeFilter}
+            title={activeFilterText}
             openClassModal={openClassModal}
           />
         </Printable>

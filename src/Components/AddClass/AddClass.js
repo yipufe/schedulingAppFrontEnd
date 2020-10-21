@@ -22,21 +22,12 @@ export default function AddClass(props) {
   } = props;
 
   const handleSetDays = (selected) => {
-    // setSchedule(selected.value);
     setScheduleDay(selected.value);
   };
   const handleSetStartTime = (selected) => {
-    // setSchedule(schedule.split(' ')[0] + ' ' + selected.value);
     setScheduleStartTime(selected.value);
   };
   const handleSetEndTime = (selected) => {
-    /*
-    setAddClassData({
-      ...addClassData,
-      meetingPattern: schedule.includes('-')
-        ? schedule.split('-')[0] + '-' + selected.value
-        : schedule + '-' + selected.value,
-    });*/
     setScheduleEndTime(selected.value)
   };
 
