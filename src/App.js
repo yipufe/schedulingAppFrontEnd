@@ -677,7 +677,7 @@ function App() {
         <Printable ref={componentRef}>
           <div className="printOnly">
             <div className="calTitleContainer">
-              <div className="calTitle bold">{activeFilterText}</div>}
+              <div className="calTitle bold">{activeFilterText}</div>
             </div>
           </div>
           <Calendar
