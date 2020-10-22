@@ -39,7 +39,7 @@ function App() {
   const [classModalData, setClassModalData] = useState({});
   const [uniqueId, setUniqueId] = useState(0);
   
-
+  //Sets meetingPattern in classModalData to new meeting pattern as defined in pattern
   function changeClassModalMeetingPattern(pattern) {
     const newClassModalData = { ...classModalData };
     newClassModalData.meetingPattern = pattern;

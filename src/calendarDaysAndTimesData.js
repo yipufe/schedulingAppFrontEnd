@@ -8,6 +8,7 @@ export const calDays = {
   Sa: 6,
 };
 
+//For schedule change comparison, left hand items
 export const calDaysLeft = {
   M: 1,
   T: 3,
@@ -17,6 +18,7 @@ export const calDaysLeft = {
   Sa: 11,
 };
 
+//For schedule change comparison, right hand items
 export const calDaysRight = {
   M: 2,
   T: 4,
@@ -211,6 +213,7 @@ export const calTimes = {
   '10pm': 181,
 };
 
+//Colors for calendar items
 export const colors = {
   0: '#bdbbc9',
   1: '#ffb500',
@@ -265,6 +268,7 @@ export const colors = {
   50: '#FFE199',
 };
 
+//Days available for scheduling
 export const selectDays = [
   { value: 'M', label: 'M' },
   { value: 'T', label: 'T' },
@@ -277,6 +281,7 @@ export const selectDays = [
   { value: 'TR', label: 'TR' },
 ];
 
+//Times available for scheduling
 export const selectTimes = [
   { value: '7am', label: '7am' },
   { value: '7:05am', label: '7:05am' },

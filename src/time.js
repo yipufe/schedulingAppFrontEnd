@@ -1,9 +1,11 @@
+//Split time string into component parts
 export function getTimeComponents(timeStr) {
     const meridian = timeStr.slice(-2);
     const [hour, minute] = timeStr.slice(0,timeStr.length-2).split(':');
     return {hour, minute, meridian};
 }
 
+//convert time string to 24 hour time and return object with values
 export function get24Hour(timeStr) {
     let time = getTimeComponents(timeStr);
     time.hour = parseInt(time.hour);
@@ -13,6 +15,7 @@ export function get24Hour(timeStr) {
     return {hour: time.hour, minute: time.minute};
 }
 
+//Return a number representing the range in hours between two times
 export function getTimeRange(timeStrStart, timeStrEnd) {
     const startTime = get24Hour(timeStrStart);
     const endTime = get24Hour(timeStrEnd);

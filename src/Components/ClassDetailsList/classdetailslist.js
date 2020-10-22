@@ -49,7 +49,6 @@ function ClassDetailsList(props) {
                   </div>
                 </td>
               </tr>
-              //courseTitle, instructor, meetingPattern, location, block, creditHours, classId, course
             );
           })}
         </tbody>
