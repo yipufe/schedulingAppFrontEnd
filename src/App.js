@@ -209,31 +209,41 @@ function App() {
             for (let item of resData) {
               if (item.field2 && item.field2 !== 'CLSS ID') {
                 // This pushes the classes into the dataArray state.
-                dataArray.push({
-                  block: item.field19,
-                  campus: item.field21,
-                  classId: item.field2,
-                  course: item.field9,
-                  courseAttributes: item.field30,
-                  courseTitle: item.field11,
-                  creditHours: item.field27,
-                  gradeMode: item.field28,
-                  instructionMethod: item.field22,
-                  instructor: item.field16.split(' (')[0],
-                  location: item.field17,
-                  maxEnrollment: item.field33,
-                  maxWaitlistEnrollment: item.field36,
-                  meetingPattern: item.field14,
-                  scheduleType: item.field12,
-                  section: item.field10,
-                  sectionAttributes: item.field29,
-                  sectionComments: item.field44,
-                  sectionText: item.field46,
-                  session: item.field20,
-                  specialApproval: item.field25,
-                  status: item.field18,
-                  visible: item.field24,
-                });
+                
+                const meetingPatternString = item.field14;
+                const meetingPatterns = meetingPatternString.split('; ');
+                for (let meetingPattern of meetingPatterns) {
+                  if(meetingPattern !== undefined) {
+                    console.log(meetingPattern);
+                    dataArray.push({
+                      block: item.field19,
+                      campus: item.field21,
+                      classId: item.field2,
+                      course: item.field9,
+                      courseAttributes: item.field30,
+                      courseTitle: item.field11,
+                      creditHours: item.field27,
+                      gradeMode: item.field28,
+                      instructionMethod: item.field22,
+                      instructor: item.field16.split(' (')[0],
+                      location: item.field17,
+                      maxEnrollment: item.field33,
+                      maxWaitlistEnrollment: item.field36,
+                      meetingPattern: meetingPattern,
+                      meetingPatternText: meetingPatternString,
+                      scheduleType: item.field12,
+                      section: item.field10,
+                      sectionAttributes: item.field29,
+                      sectionComments: item.field44,
+                      sectionText: item.field46,
+                      session: item.field20,
+                      specialApproval: item.field25,
+                      status: item.field18,
+                      visible: item.field24,
+                    });
+
+                  }
+                }
               }
             }
             setInitialData(dataArray);

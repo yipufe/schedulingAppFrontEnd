@@ -207,7 +207,7 @@ function CalendarFront(props) {
                     <br />
                     {cl.instructor}
                     <br />
-                    {cl.meetingPattern}
+                    {cl.meetingPatternText}
                   </ReactTooltip>
                 </div>
               );
@@ -248,7 +248,7 @@ function CalendarFront(props) {
                     <br />
                     {cl.instructor}
                     <br />
-                    {cl.meetingPattern}
+                    {cl.meetingPatternText}
                   </ReactTooltip>
                 </div>
               );
@@ -302,7 +302,7 @@ function CalendarFront(props) {
               {event.courseTitle.substring(0, 8) + '...'}
             </p>
   
-            { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+            { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPatternText}</p> }
             <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
               {event.course}-{event.section}
               <br />
@@ -310,7 +310,7 @@ function CalendarFront(props) {
               <br />
               {event.instructor}
               <br />
-              {event.meetingPattern}
+              {event.meetingPatternText}
             </ReactTooltip>
           </Container>
         );
@@ -377,7 +377,7 @@ function CalendarFront(props) {
                   </p>
                 }
                 
-                { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+                { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPatternText}</p> }
                 <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
                   {event.course}-{event.section}
                   <br />
@@ -385,7 +385,7 @@ function CalendarFront(props) {
                   <br />
                   {event.instructor}
                   <br />
-                  {event.meetingPattern}
+                  {event.meetingPatternText}
                 </ReactTooltip>
               </ContainerChange>
             );    
@@ -420,7 +420,7 @@ function CalendarFront(props) {
                 </p>
               }
               
-              { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPattern}</p> }
+              { timeSpan>1.5 && <p className="cal-front-item-p">{event.meetingPatternText}</p> }
               <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
                 {event.course}-{event.section}
                 <br />
@@ -428,7 +428,7 @@ function CalendarFront(props) {
                 <br />
                 {event.instructor}
                 <br />
-                {event.meetingPattern}
+                {event.meetingPatternText}
               </ReactTooltip>
             </Container>
           );  
