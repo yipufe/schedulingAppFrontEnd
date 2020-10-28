@@ -38,6 +38,7 @@ function App() {
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
   const [uniqueId, setUniqueId] = useState(0);
+  const [yearSemester, setYearSemester] = useState('');
   
   //Sets meetingPattern in classModalData to new meeting pattern as defined in pattern
   function changeClassModalMeetingPattern(pattern) {
@@ -203,6 +204,8 @@ function App() {
           })
           .then((resData) => {
             
+            setYearSemester(Object.keys(resData[0])[0]);
+
             // These are all the empty arrays that will be filled with data after filtering through the resData.
             const dataArray = [];
             // This for loop is for filtering through the data and getting rid of all the heading rows and columns in the csv file.
@@ -212,13 +215,13 @@ function App() {
                 
                 const meetingPatternString = item.field14;
                 const meetingPatterns = meetingPatternString.split('; ');
+                let peaceNumber = 1;
                 for (let meetingPattern of meetingPatterns) {
                   if(meetingPattern !== undefined) {
-                    console.log(meetingPattern);
                     dataArray.push({
                       block: item.field19,
                       campus: item.field21,
-                      classId: item.field2,
+                      classId: item.field2+'_'+(peaceNumber++),   //adds a tag to the classId '_1', '_2', etc. so each split class has a unique classId
                       course: item.field9,
                       courseAttributes: item.field30,
                       courseTitle: item.field11,
@@ -711,6 +714,7 @@ function App() {
             handleRoomChange={handleRoomChange}
             handleCourseChange={handleCourseChange}
             clearFilters={clearFilters}
+            yearSemester={yearSemester}
           />
           <ClassDetailsList 
             displayData={displayData} 
