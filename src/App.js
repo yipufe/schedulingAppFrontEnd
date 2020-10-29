@@ -38,14 +38,31 @@ function App() {
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
   const [uniqueId, setUniqueId] = useState(0);
-  const [yearSemester, setYearSemester] = useState('');
   
   //Sets meetingPattern in classModalData to new meeting pattern as defined in pattern
   function changeClassModalMeetingPattern(pattern) {
     const newClassModalData = { ...classModalData };
+    
+    //Modify meetingPatternText to reflect changes
+    const oldPatterns = newClassModalData.meetingPatternText.split('; ');
+    let newPat = '';
+    let cnt = 0;
+    for(let oldPat of oldPatterns) {
+      if(oldPat !== undefined) {
+        if(oldPat === newClassModalData.meetingPattern) {
+          newPat += (cnt++===0?'':'; ') + pattern;
+        } else {
+          newPat += (cnt++===0?'':'; ') + oldPat;
+        }  
+      }
+    }
+
     newClassModalData.meetingPattern = pattern;
+    newClassModalData.meetingPatternText = newPat;
+
     setClassModalData(newClassModalData);
   }
+
 
   //Called when class information changes in the modal due to the user changing an input field
   //Uses the input id to identify what value is changing
@@ -78,12 +95,33 @@ function App() {
       classModalData.meetingPattern = 'Sa' + classModalData.meetingPattern;
     }
 
+    const classIdPart = classId.split('_')[0];
+
     //set Changed data
     const indexChangedData = initialAndChangedData.findIndex((item) => {
       return item.classId === classId;
     });
     const tempChangedData = [...initialAndChangedData];
     tempChangedData[indexChangedData] = classModalData;
+
+
+
+    //Change data
+    const sameChangeClassSet = initialAndChangedData.filter(item=>{
+      return item.classId.split('_')[0] === classIdPart;
+    });
+    
+    sameChangeClassSet.forEach(itemWithId=>{
+      const index = initialAndChangedData.findIndex(item=>{
+        return item.classId === itemWithId.classId;
+      })
+      tempChangedData[index].meetingPatternText = classModalData.meetingPatternText;
+    })
+    setInitialAndChangedData(tempChangedData);
+
+
+
+
     setInitialAndChangedData(tempChangedData);
 
     //Set Display data
@@ -92,48 +130,26 @@ function App() {
     });
     const tempDisplayData = [...displayData];
     tempDisplayData[indexDisplayData] = classModalData;
-    setDisplayData(tempDisplayData);
 
-    //updateMeetingPatternText(classId, classModalData.meetingPatternText)
-
-    //Hide modal
-    setClassModalIsOpen(false);
-  }
-
-
-  function updateMeetingPatternText(classId, newMeetingPatternText) {
-    const classIdPart = classId.split('_')[0];
-
-    console.log(classId, classIdPart);
-    //Change data
-    const sameChangeClassSet = initialAndChangedData.filter(item=>{
-      return item.classId.split('_')[0] === classIdPart;
-    });
-    
-    const tempChangedData = [...initialAndChangedData];
-    sameChangeClassSet.forEach(itemWithId=>{
-      const index = initialAndChangedData.findIndex(item=>{
-        return item.classId === itemWithId.classId;
-      })
-      tempChangedData[index].meetingPatternText = newMeetingPatternText;
-    })
-    setInitialAndChangedData(tempChangedData);
 
     //Set display data
     const sameDisplayClassSet = displayData.filter(item=>{
       return item.classId.split('_')[0] === classIdPart;
     });
 
-    const tempDisplayData = [...displayData];
     sameDisplayClassSet.forEach(itemWithId=>{
       const index = displayData.findIndex(item=>{
         return item.classId === itemWithId.classId;
       })
-      tempDisplayData[index].meetingPatternText = newMeetingPatternText;
+      tempDisplayData[index].meetingPatternText = classModalData.meetingPatternText;
     })
-    setDisplayData(tempDisplayData);
-  }
 
+
+    setDisplayData(tempDisplayData);
+
+    //Hide modal
+    setClassModalIsOpen(false);
+  }
 
   //delete class modal control
   function deleteClass(classId) {
@@ -240,8 +256,6 @@ function App() {
             return res.json();
           })
           .then((resData) => {
-            
-            setYearSemester(Object.keys(resData[0])[0]);
 
             // These are all the empty arrays that will be filled with data after filtering through the resData.
             const dataArray = [];
