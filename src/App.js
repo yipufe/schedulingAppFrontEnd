@@ -94,9 +94,46 @@ function App() {
     tempDisplayData[indexDisplayData] = classModalData;
     setDisplayData(tempDisplayData);
 
+    //updateMeetingPatternText(classId, classModalData.meetingPatternText)
+
     //Hide modal
     setClassModalIsOpen(false);
   }
+
+
+  function updateMeetingPatternText(classId, newMeetingPatternText) {
+    const classIdPart = classId.split('_')[0];
+
+    console.log(classId, classIdPart);
+    //Change data
+    const sameChangeClassSet = initialAndChangedData.filter(item=>{
+      return item.classId.split('_')[0] === classIdPart;
+    });
+    
+    const tempChangedData = [...initialAndChangedData];
+    sameChangeClassSet.forEach(itemWithId=>{
+      const index = initialAndChangedData.findIndex(item=>{
+        return item.classId === itemWithId.classId;
+      })
+      tempChangedData[index].meetingPatternText = newMeetingPatternText;
+    })
+    setInitialAndChangedData(tempChangedData);
+
+    //Set display data
+    const sameDisplayClassSet = displayData.filter(item=>{
+      return item.classId.split('_')[0] === classIdPart;
+    });
+
+    const tempDisplayData = [...displayData];
+    sameDisplayClassSet.forEach(itemWithId=>{
+      const index = displayData.findIndex(item=>{
+        return item.classId === itemWithId.classId;
+      })
+      tempDisplayData[index].meetingPatternText = newMeetingPatternText;
+    })
+    setDisplayData(tempDisplayData);
+  }
+
 
   //delete class modal control
   function deleteClass(classId) {
@@ -714,7 +751,6 @@ function App() {
             handleRoomChange={handleRoomChange}
             handleCourseChange={handleCourseChange}
             clearFilters={clearFilters}
-            yearSemester={yearSemester}
           />
           <ClassDetailsList 
             displayData={displayData} 
