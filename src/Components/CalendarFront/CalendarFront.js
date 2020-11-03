@@ -41,11 +41,11 @@ function CalendarFront(props) {
 
   if (displayData) {
     meetingPatternArr = displayData.filter(
-      (course) => course.meetingPattern !== 'Does Not Meet'
+      (course) => course.meetingPattern !== 'Does Not Meet' && course.status === 'Active'
     );
   } else {
     meetingPatternArr = initialAndChangedData.filter(
-      (course) => course.meetingPattern !== 'Does Not Meet'
+      (course) => course.meetingPattern !== 'Does Not Meet' && course.status === 'Active'
     );
   }
 
