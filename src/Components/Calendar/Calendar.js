@@ -59,6 +59,7 @@ function Calendar(props) {
 
   return (
     <div className="calendar-wrap">
+      <div className="calendar-title">{props.yearSemester}</div>
       <section className="calendar-header">
       {compareSchedule&&
         <div className="comparison-legend">
