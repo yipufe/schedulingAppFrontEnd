@@ -40,6 +40,16 @@ function Calendar(props) {
   }
   let showCalendar = !(filteredDisplayData.length===0 && props.displayData.length>0) && props.displayData.length<displayCap;
 
+  //Hide calendar if room is of a certain type
+  if(props.activeFilter.filter === 'Room') {
+    if(props.activeFilter.options.value === 'ONLINE ONLINE' ||
+      props.activeFilter.options.value === 'LIVE STREAM' ||
+      props.activeFilter.options.value === 'General Assignment Room') {
+        showCalendar = false;
+      }
+  }
+  console.log("Active Filter:", props.activeFilter, showCalendar);
+
   const handleAddClass = (e) => {
     setAddClassData({
       ...addClassData,
