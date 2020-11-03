@@ -51,7 +51,7 @@ function CalendarFront(props) {
 
   //Filter original schedule removing classes that do not meet
   meetingPatternArrOriginal = initialDataFiltered.filter(
-    (course) => course.meetingPattern !== 'Does Not Meet'
+    (course) => course.meetingPattern !== 'Does Not Meet' && course.status === 'Active'
   );
 
   let colorsUsedOnOriginal = [];  //Array for keeping track of colors used in displaying original schedule
