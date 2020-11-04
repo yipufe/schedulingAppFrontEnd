@@ -38,7 +38,8 @@ function App() {
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
   const [uniqueId, setUniqueId] = useState(0);
-  
+  const [yearSemester, setYearSemester] = useState('');
+
   //Sets meetingPattern in classModalData to new meeting pattern as defined in pattern
   function changeClassModalMeetingPattern(pattern) {
     const newClassModalData = { ...classModalData };
@@ -220,7 +221,8 @@ function App() {
               sessionFromFile.roomValue !== undefined &&
               sessionFromFile.instructorValue !== undefined &&
               sessionFromFile.blockValue !== undefined &&
-              sessionFromFile.activeFilter !== undefined) {
+              sessionFromFile.activeFilter !== undefined && 
+              sessionFromFile.yearSemester !== undefined) {
             //populate values with contents
             setInitialData(sessionFromFile.initialData);
             setInitialDataFiltered(sessionFromFile.initialDataFiltered);
@@ -233,6 +235,8 @@ function App() {
             setBlockValue(sessionFromFile.blockValue);
             setActiveFilter(sessionFromFile.activeFilter);
             setActiveFilterText(sessionFromFile.activeFilter.filter+': '+sessionFromFile.activeFilter.options.label);
+
+            setYearSemester(sessionFromFile.yearSemester);
           } else {
             alert("Couldn't read file!")
           }
@@ -257,6 +261,8 @@ function App() {
           })
           .then((resData) => {
 
+            setYearSemester( Object.keys(resData[0])[0] );  //Get the year and semester from the first line of the csv file (it shows up as the key in the JSON object)
+            
             // These are all the empty arrays that will be filled with data after filtering through the resData.
             const dataArray = [];
             // This for loop is for filtering through the data and getting rid of all the heading rows and columns in the csv file.
@@ -362,6 +368,8 @@ function App() {
       instructorValue,
       blockValue,
       activeFilter,
+
+      yearSemester,
     }
 
     //Create new file with session data as contents
@@ -685,6 +693,7 @@ function App() {
     setActiveFilter({});
     setInitialAndChangedData([]);
     setInitialDataFiltered([]);
+    setYearSemester('');
   };
 
   //Print handler
@@ -765,6 +774,7 @@ function App() {
             handleRoomChange={handleRoomChange}
             handleCourseChange={handleCourseChange}
             clearFilters={clearFilters}
+            yearSemester={yearSemester}
           />
           <ClassDetailsList 
             displayData={displayData} 
