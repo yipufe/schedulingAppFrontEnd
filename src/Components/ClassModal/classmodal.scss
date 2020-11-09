@@ -22,7 +22,7 @@
 }
 
 .add-class-modal {
-  width: 60vw;
+  width: 80vw;
   border: none;
   outline: none;
   display: flex;
@@ -41,7 +41,7 @@
   align-items: flex-start;
 }
 .add-class-modal-wrap {
-  width: 55vw;
+  width: 100vw;
   background: white;
   border-radius: 5px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
@@ -132,7 +132,7 @@
   }
 }
 .schedule-selects {
-  width: 100%;
+  width: 55%;
   display: flex;
   align-items: center;
   justify-content: space-between;
