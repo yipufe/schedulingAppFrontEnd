@@ -6,7 +6,9 @@ import { selectDays, selectTimes } from '../../calendarDaysAndTimesData';
 
 export default function AddClass(props) {
   const { initialAndChangedData, setInitialAndChangedData } = props;
-  const [schedule, setSchedule] = useState('');
+  const [scheduleDay, setScheduleDay] = useState('');
+  const [scheduleStartTime, setScheduleStartTime] = useState('');
+  const [scheduleEndTime, setScheduleEndTime] = useState('');
   const [addClassFormError, setAddClassFormError] = useState(false);
 
   const {
@@ -15,21 +17,18 @@ export default function AddClass(props) {
     setOpenAddClassModal,
     setAddClassData,
     setAddClassSuccess,
+    uniqueId,
+    setUniqueId,
   } = props;
 
   const handleSetDays = (selected) => {
-    setSchedule(selected.value);
+    setScheduleDay(selected.value);
   };
   const handleSetStartTime = (selected) => {
-    setSchedule(schedule.split(' ')[0] + ' ' + selected.value);
+    setScheduleStartTime(selected.value);
   };
   const handleSetEndTime = (selected) => {
-    setAddClassData({
-      ...addClassData,
-      meetingPattern: schedule.includes('-')
-        ? schedule.split('-')[0] + '-' + selected.value
-        : schedule + '-' + selected.value,
-    });
+    setScheduleEndTime(selected.value)
   };
 
   //Same room at same time error checking
@@ -389,18 +388,45 @@ export default function AddClass(props) {
         <button
           className="add-class-save-btn"
           onClick={() => {
-            if (checkConflicts()){
-              if (Object.keys(addClassData).length === 23) {
+            let hasValues=true;
+            let valueCount=0;
+            const fieldsCount = 24; //Number of values in the modal
+            
+            if(scheduleDay !== '' && scheduleStartTime !== '' && scheduleEndTime !== '') {
+              addClassData.meetingPattern = scheduleDay+' '+scheduleStartTime+'-'+scheduleEndTime;
+              addClassData.meetingPatternText = addClassData.meetingPattern;
+            } else {
+              setAddClassFormError(true);
+              return;
+            }
+            
+            Object.keys(addClassData).forEach((key)=>{
+              //Do not count if keys are the following: classId, filteredBy
+              if(key!=='classId' && key!=='filteredBy')
+                valueCount++;
+              if(addClassData[key] === '')
+                hasValues=false;
+            })
+            
+            console.log("Has Values:", hasValues, valueCount, "ClassData:", addClassData);
+            if (hasValues&&valueCount===fieldsCount) {  //if (Object.keys(addClassData).length === 23) {
+              if (checkConflicts()){
+                //Give new class a unique ID
+                addClassData.classId = 'ID'+uniqueId;
+                setUniqueId(uniqueId+1);
+
                 setInitialAndChangedData([
                   ...initialAndChangedData,
                   addClassData,
                 ]);
+                setAddClassData({});  //Reset addClassData
                 setAddClassSuccess(true);
                 setAddClassFormError(false);
-              } else {
-                setAddClassFormError(true);
               }
+            } else {
+              setAddClassFormError(true);
             }
+            
           }}
         >
           Save Section

@@ -8,6 +8,7 @@ import Footer from './Components/Footer/Footer';
 import { useReactToPrint } from 'react-to-print';
 import Printable from './Components/Print/printable';
 import ClassDetailsList from './Components/ClassDetailsList/classdetailslist';
+import {meetingPatternsOverlap} from './time'
 
 import Modal from 'react-modal';
 import ClassModal from './Components/ClassModal/classmodal';
@@ -30,16 +31,39 @@ function App() {
   const [instructorValue, setInstructorValue] = useState([]);
   const [block, setBlock] = useState([]);
   const [blockValue, setBlockValue] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('');
-
+  const [activeFilter, setActiveFilter] = useState({});
+  const [activeFilterText, setActiveFilterText] = useState('');
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [collisions, setCollisions] = useState([]);
   const [classModalIsOpen, setClassModalIsOpen] = useState(false);
   const [classModalData, setClassModalData] = useState({});
+  const [uniqueId, setUniqueId] = useState(0);
+  const [yearSemester, setYearSemester] = useState('');
 
+  //Sets meetingPattern in classModalData to new meeting pattern as defined in pattern
   function changeClassModalMeetingPattern(pattern) {
     const newClassModalData = { ...classModalData };
+    
+    //Modify meetingPatternText to reflect changes
+    const oldPatterns = newClassModalData.meetingPatternText.split('; ');
+    let newPat = '';
+    let cnt = 0;
+    for(let oldPat of oldPatterns) {
+      if(oldPat !== undefined) {
+        if(oldPat === newClassModalData.meetingPattern) {
+          newPat += (cnt++===0?'':'; ') + pattern;
+        } else {
+          newPat += (cnt++===0?'':'; ') + oldPat;
+        }  
+      }
+    }
+
     newClassModalData.meetingPattern = pattern;
+    newClassModalData.meetingPatternText = newPat;
+
     setClassModalData(newClassModalData);
   }
+
 
   //Called when class information changes in the modal due to the user changing an input field
   //Uses the input id to identify what value is changing
@@ -72,12 +96,33 @@ function App() {
       classModalData.meetingPattern = 'Sa' + classModalData.meetingPattern;
     }
 
+    const classIdPart = classId.split('_')[0];
+
     //set Changed data
     const indexChangedData = initialAndChangedData.findIndex((item) => {
       return item.classId === classId;
     });
     const tempChangedData = [...initialAndChangedData];
     tempChangedData[indexChangedData] = classModalData;
+
+
+
+    //Change data
+    const sameChangeClassSet = initialAndChangedData.filter(item=>{
+      return item.classId.split('_')[0] === classIdPart;
+    });
+    
+    sameChangeClassSet.forEach(itemWithId=>{
+      const index = initialAndChangedData.findIndex(item=>{
+        return item.classId === itemWithId.classId;
+      })
+      tempChangedData[index].meetingPatternText = classModalData.meetingPatternText;
+    })
+    setInitialAndChangedData(tempChangedData);
+
+
+
+
     setInitialAndChangedData(tempChangedData);
 
     //Set Display data
@@ -86,6 +131,21 @@ function App() {
     });
     const tempDisplayData = [...displayData];
     tempDisplayData[indexDisplayData] = classModalData;
+
+
+    //Set display data
+    const sameDisplayClassSet = displayData.filter(item=>{
+      return item.classId.split('_')[0] === classIdPart;
+    });
+
+    sameDisplayClassSet.forEach(itemWithId=>{
+      const index = displayData.findIndex(item=>{
+        return item.classId === itemWithId.classId;
+      })
+      tempDisplayData[index].meetingPatternText = classModalData.meetingPatternText;
+    })
+
+
     setDisplayData(tempDisplayData);
 
     //Hide modal
@@ -115,9 +175,20 @@ function App() {
 
   // This function is for when the user uploads a file it stores the file in the file state.
   const handleChange = (e) => {
-    const file = e.target.files[0]; // accessing file
-    setFile(file); // storing file
+    if(e.target.files.length > 0) {
+      const file = e.target.files[0]; // accessing file
+      setFile(file); // storing file
+    }
   };
+
+  //File reader with promise
+  function promiseFileReader(file){
+    return new Promise(res => {
+      var fileReader = new FileReader();  
+      fileReader.onload = res;
+      fileReader.readAsText(file);
+    });
+  }
 
   /*
     This function is the main function that actually uploads the file to the server,
@@ -125,98 +196,133 @@ function App() {
   */
   const csvFileHandler = (e) => {
     e.preventDefault();
+    
+    //Checks to see if a file was selected and is available for processing.
+    if(file === '') {
+      alert('No file selected!');
+      return;
+    }
+    
     const formData = new FormData();
-    formData.append('csvfile', file);
-    let url = 'https://schedge.dev/calendar/postcsv'; //'https://schedge.dev/calendar/postcsv';
-    let method = 'POST';
+    
+    const fileNameParts = file.name.split('.'); //Split file name at period
+    let extension = '';
+    if(fileNameParts.length > 1) {  //if file name contains no extention this will be false
+      extension = fileNameParts[fileNameParts.length-1];
+      if(extension==="sched") { //If file type is *.sched
+        promiseFileReader(file).then(e=>{ //Parse file as text
+          const sessionFromFile = JSON.parse(e.target.result);  //Convert to JSON obj
 
-    fetch(url, {
-      method: method,
-      body: formData,
-    })
-      .then((res) => {
-        if (res.status !== 200) {
-          throw new Error('Uploading file failed!');
-        }
-        return res.json();
-      })
-      .then((resData) => {
-        console.log(resData);
-        // These are all the empty arrays that will be filled with data after filtering through the resData.
-        const dataArray = [];
-        // This for loop is for filtering through the data and getting rid of all the heading rows and columns in the csv file.
-        for (let item of resData) {
-          if (item.field2 && item.field2 !== 'CLSS ID') {
-            // This pushes the classes into the dataArray state.
-            dataArray.push({
-              block: item.field19,
-              campus: item.field21,
-              classId: item.field2,
-              course: item.field9,
-              courseAttributes: item.field30,
-              courseTitle: item.field11,
-              creditHours: item.field27,
-              gradeMode: item.field28,
-              instructionMethod: item.field22,
-              instructor: item.field16.split(' (')[0],
-              location: item.field17,
-              maxEnrollment: item.field33,
-              maxWaitlistEnrollment: item.field36,
-              meetingPattern: item.field14,
-              scheduleType: item.field12,
-              section: item.field10,
-              sectionAttributes: item.field29,
-              sectionComments: item.field44,
-              sectionText: item.field46,
-              session: item.field20,
-              specialApproval: item.field25,
-              status: item.field18,
-              visible: item.field24,
-            });
-          }
-        }
-        //time and instructor schedule
-        const filterArray = [];
-        var uniqueObj = [];
-        var bool = true;
-        dataArray.forEach((data) => {
-          if (
-            !filterArray.find(
-              (dat) =>
-                dat.instructor === data.instructor &&
-                dat.course === data.course &&
-                dat.meetingPattern === data.meetingPattern
-            )
-          ) {
-            const { instructor, course, meetingPattern } = data;
-            filterArray.push({ instructor, course, meetingPattern });
-          }
-        });
+          if(sessionFromFile.initialData !== undefined &&   //Check for objects within
+              sessionFromFile.initialDataFiltered !== undefined &&
+              sessionFromFile.initialAndChangedData !== undefined &&
+              sessionFromFile.displayData !== undefined &&
+              sessionFromFile.courseValue !== undefined &&
+              sessionFromFile.roomValue !== undefined &&
+              sessionFromFile.instructorValue !== undefined &&
+              sessionFromFile.blockValue !== undefined &&
+              sessionFromFile.activeFilter !== undefined && 
+              sessionFromFile.yearSemester !== undefined) {
+            //populate values with contents
+            setInitialData(sessionFromFile.initialData);
+            setInitialDataFiltered(sessionFromFile.initialDataFiltered);
+            setInitialAndChangedData(sessionFromFile.initialAndChangedData);
+            setDisplayData(sessionFromFile.displayData);
 
-        for (var i = 0; i < filterArray.length; i++) {
-          if (
-            uniqueObj.indexOf(filterArray[i].instructor) === -1 &&
-            uniqueObj.indexOf(filterArray[i].course) === -1 &&
-            uniqueObj.indexOf(filterArray[i].meetingPattern) === -1
-          ) {
-            bool = true;
+            setCourseValue(sessionFromFile.courseValue);
+            setRoomValue(sessionFromFile.roomValue);
+            setInstructorValue(sessionFromFile.instructorValue);
+            setBlockValue(sessionFromFile.blockValue);
+            setActiveFilter(sessionFromFile.activeFilter);
+            setActiveFilterText(sessionFromFile.activeFilter.filter+': '+sessionFromFile.activeFilter.options.label);
+
+            setYearSemester(sessionFromFile.yearSemester);
           } else {
-            bool = false;
+            alert("Couldn't read file!")
           }
-        }
-        if (bool === true) {
-          alert('No schedule intersects');
-        } else {
-          alert('schedule intersects');
-          return;
-        }
-        console.log(dataArray);
-        setInitialData(dataArray);
-        setInitialDataFiltered(dataArray);
-        setInitialAndChangedData(dataArray);
-        setDisplayData(dataArray);
-      })
-      .catch((err) => console.log(err));
+
+        })    
+      } else if(extension==="csv") {  //If file type is *.csv
+
+
+        formData.append('csvfile', file);
+        let url = 'https://schedge.dev/calendar/postcsv'; //'http://10.52.2.25:8080/calendar/postcsv';
+        let method = 'POST';
+    
+        fetch(url, {
+          method: method,
+          body: formData,
+        })
+          .then((res) => {
+            if (res.status !== 200) {
+              throw new Error('Uploading file failed!');
+            }
+            return res.json();
+          })
+          .then((resData) => {
+
+            setYearSemester( Object.keys(resData[0])[0] );  //Get the year and semester from the first line of the csv file (it shows up as the key in the JSON object)
+            
+            // These are all the empty arrays that will be filled with data after filtering through the resData.
+            const dataArray = [];
+            // This for loop is for filtering through the data and getting rid of all the heading rows and columns in the csv file.
+            for (let item of resData) {
+              if (item.field2 && item.field2 !== 'CLSS ID') {
+                // This pushes the classes into the dataArray state.
+                
+                const meetingPatternString = item.field14;
+                const meetingPatterns = meetingPatternString.split('; ');
+                let peaceNumber = 1;
+                for (let meetingPattern of meetingPatterns) {
+                  if(meetingPattern !== undefined) {
+                    dataArray.push({
+                      block: item.field19,
+                      campus: item.field21,
+                      classId: item.field2+'_'+(peaceNumber++),   //adds a tag to the classId '_1', '_2', etc. so each split class has a unique classId
+                      course: item.field9,
+                      courseAttributes: item.field30,
+                      courseTitle: item.field11,
+                      creditHours: item.field27,
+                      gradeMode: item.field28,
+                      instructionMethod: item.field22,
+                      instructor: item.field16.split(' (')[0],
+                      location: item.field17,
+                      maxEnrollment: item.field33,
+                      maxWaitlistEnrollment: item.field36,
+                      meetingPattern: meetingPattern,
+                      meetingPatternText: meetingPatternString,
+                      scheduleType: item.field12,
+                      section: item.field10,
+                      sectionAttributes: item.field29,
+                      sectionComments: item.field44,
+                      sectionText: item.field46,
+                      session: item.field20,
+                      specialApproval: item.field25,
+                      status: item.field18,
+                      visible: item.field24,
+                    });
+
+                  }
+                }
+              }
+            }
+            setInitialData(dataArray);
+            setInitialDataFiltered(dataArray);
+            setInitialAndChangedData(dataArray);
+            setDisplayData(dataArray);
+            setFirstLoad(true);
+          })
+          .catch((err) => console.log(err));
+    
+
+      } else {  //if file type is not supported
+        console.log("File type unsupported!");
+      }
+    } else {  //if file type is not given
+      console.log("File type unsupported!");
+    }
+
+
   };
 
   //export to excel file and start download
@@ -224,7 +330,7 @@ function App() {
     ev.preventDefault();
     const formData = new FormData();
     formData.append('displaydata', JSON.stringify(displayData));
-    let url = 'https://schedge.dev/export/postexcel';
+    let url = 'https://schedge.dev/export/postexcel'; //'http://10.52.2.25:8080/export/postexcel';
     let method = 'POST';
 
     fetch(url, {
@@ -249,13 +355,88 @@ function App() {
       });
   };
 
+  //Saves session to file and auto downloads the file
+  const saveSession = () => {
+    const session = {
+      initialData,
+      initialDataFiltered,
+      initialAndChangedData,
+      displayData,
+
+      courseValue,
+      roomValue,
+      instructorValue,
+      blockValue,
+      activeFilter,
+
+      yearSemester,
+    }
+
+    //Create new file with session data as contents
+    const file = new File([JSON.stringify(session)], 'Session.sched', {
+      type: 'text/plain'
+    });
+    const downloadLink = document.createElement('a'); //create download link
+    const url = window.URL.createObjectURL(file);
+    downloadLink.href = url;  //set file as download content
+    downloadLink.download = 'Session.sched';  //call the file Session.sched
+    downloadLink.click(); //Start download
+
+  }
+
+  //Gets all collisions of calendar item
+  const getCollisions = (compareItem, dataSet, filteredBy) => {
+    if(compareItem.meetingPattern === 'Does Not Meet')
+      return [];
+    
+    //get all collisions with compareItem
+    let collisions = dataSet.filter((item)=>{
+      let overlaps = false;
+      if(compareItem[filteredBy] === item[filteredBy]) {
+        if(item.meetingPattern !== 'Does Not Meet') {
+          overlaps = meetingPatternsOverlap(compareItem.meetingPattern, item.meetingPattern)
+        }
+      }
+      return overlaps;
+    });
+    if(collisions.length <= 1)
+      return [];
+    //Include under what condition the collision occurred
+    collisions= collisions.map(collision=> {
+      collision.collisionAt = filteredBy;
+      return collision;
+    });
+    return JSON.parse( JSON.stringify( collisions ) );  //deep copy, passes back a copy of the collisions
+  }
+
   useEffect(() => {
     const roomArray = [];
     const instructorArray = [];
     const blockArray = [];
     const courseArray = [];
+    const collisionsArray = [];
     // This for loop loops through the dataArray and pushes the correct data into each of the different useState data arrays.
     for (let item of initialAndChangedData) {
+      
+      //Find collisions for courses
+      const courseCollision = getCollisions(item, initialAndChangedData, 'course');
+      if(courseCollision.length > 0)
+        collisionsArray.push( courseCollision );
+      
+      //Find collisions for locations
+      if(item.location !== "General Assignment Room" && item.location !== "LIVE STREAM" && item.location !== "General Assignment Room; ONLINE ONLINE") {
+        const locationCollision = getCollisions(item, initialAndChangedData, 'location');
+        if(locationCollision.length > 0)
+          collisionsArray.push( locationCollision );
+      }
+      
+      //Find collisions for instructors
+      if(item.instructor !== "Staff [Primary, 100%]" ) {
+        const instructorCollision = getCollisions(item, initialAndChangedData, 'instructor')
+        if(instructorCollision.length > 0)
+          collisionsArray.push( instructorCollision );
+      }
+      
       if (roomArray.length <= 0) {
         const room = item.location.split(';')[0]; //Remove extra information after the semicolon
         roomArray.push(room);
@@ -344,11 +525,68 @@ function App() {
     setRoom(roomOptions);
     setInstructor(instructorOptions);
     setBlock(blockOptions);
-  }, [initialAndChangedData]);
+    
+    
+    //Remove duplicates from collisionsArray
+    const collisionsArrayTrimmed = collisionsArray.filter((collisionSet,index)=>{
+      return index === collisionsArray.findIndex(item=>{
+        return collisionSetsEquivalant(item, collisionSet);
+      });
+    });
+    setCollisions(collisionsArrayTrimmed);
+    
+
+    if(firstLoad) {  //if file is loaded in clear filters which sets the course filter to a default course
+      clearFilters();
+      setFirstLoad( false );
+    } else {
+      //Redisplay data
+      switch(activeFilter.filter) {
+        case('Block'):
+          handleBlockChange(activeFilter.options);
+          break;
+        case('Instructor'):
+          handleInstructorChange(activeFilter.options);
+          break;
+        case('Room'):
+          handleRoomChange(activeFilter.options);
+          break;
+        case('Course'):
+          handleCourseChange(activeFilter.options);
+          break;
+        default:
+      }
+      
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialAndChangedData, firstLoad]);
+
+  //true if collision sets are identicle
+  function collisionSetsEquivalant(set1,set2) {
+    let matchCount=0;
+    for(let i=0;i<set1.length;i++) {
+      for(let j=0;j<set2.length;j++) {
+        if(set1[i].classId === set2[j].classId && 
+            set1[i].classId !== undefined && 
+            set1[i].collisionAt === set2[j].collisionAt)
+          matchCount++;
+        else if(set1[i].course === set2[j].course &&
+          set1[i].courseTitle === set2[j].courseTitle &&
+          set1[i].instructor === set2[j].instructor && 
+          set1[i].room === set2[j].room &&
+          set1[i].meetingPattern === set2[j].meetingPattern &&
+          set1[i].collisionAt === set2[j].collisionAt) {
+            matchCount++;
+          }
+      }
+    }
+    return matchCount === set1.length;
+  }
 
   // Each of these handle change functions do the same thing for each filter and are for when the user selects something in the filters.
   // When a user selects something it filters through the specific filter data and sets the specific useState with the new filtered data.
-  // Each function also resets the other filters back to 0.
+  // Each function also resets the other filters back to 0.  
   const handleBlockChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
     const blockFilteredData = initialAndChangedData.filter(
@@ -363,7 +601,8 @@ function App() {
     setCourseValue({ label: 'Filter Course...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setRoomValue({ label: 'Filter Room...', value: 0 });
-    setActiveFilter('Block: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Block'});
+    setActiveFilterText('Block: '+ selectedOption.label);
   };
   const handleInstructorChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
@@ -380,7 +619,8 @@ function App() {
     setCourseValue({ label: 'Filter Course...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
     setRoomValue({ label: 'Filter Room...', value: 0 });
-    setActiveFilter('Instructor: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Instructor'});
+    setActiveFilterText('Instructor: '+ selectedOption.label);
   };
   const handleRoomChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
@@ -404,7 +644,8 @@ function App() {
     setCourseValue({ label: 'Filter Course...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
-    setActiveFilter('Room: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Room'});
+    setActiveFilterText('Room: '+ selectedOption.label);
   };
   const handleCourseChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
@@ -420,7 +661,8 @@ function App() {
     setRoomValue({ label: 'Filter Room...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
-    setActiveFilter('Course: ' + selectedOption.label);
+    setActiveFilter({options: selectedOption, filter: 'Course'});
+    setActiveFilterText('Course: '+ selectedOption.label);
   };
 
   const clearFilters = () => {
@@ -430,7 +672,11 @@ function App() {
     setRoomValue({ label: 'Filter Room...', value: 0 });
     setInstructorValue({ label: 'Filter Instructor...', value: 0 });
     setBlockValue({ label: 'Filter Block...', value: 0 });
-    setActiveFilter('');
+    setActiveFilter({});
+
+    //Filter default
+    if(room.length > 0)
+      handleRoomChange(room[0]);  //Set room filter to first room in room list
   };
   const handleResetCalendar = () => {
     setFile('');
@@ -444,8 +690,10 @@ function App() {
     setRoomValue([]);
     setInitialData([]);
     setDisplayData([]);
-    setActiveFilter('');
+    setActiveFilter({});
     setInitialAndChangedData([]);
+    setInitialDataFiltered([]);
+    setYearSemester('');
   };
 
   //Print handler
@@ -497,11 +745,12 @@ function App() {
           setDisplayData={setDisplayData}
           setInitialData={setInitialData}
           handleResetCalendar={handleResetCalendar}
+          collisions={collisions}
         />
         <Printable ref={componentRef}>
           <div className="printOnly">
             <div className="calTitleContainer">
-              <div className="calTitle bold">{activeFilter}</div>
+              <div className="calTitle bold">{activeFilterText}</div>
             </div>
           </div>
           <Calendar
@@ -516,8 +765,22 @@ function App() {
             handlePrint={handlePrint}
             handleExcelExport={exportAsExcelFileHandler}
             openClassModal={openClassModal}
+            activeFilter={activeFilter}
+            saveSession={saveSession}
+            setUniqueId={setUniqueId}
+            uniqueId={uniqueId}
+            handleBlockChange={handleBlockChange}
+            handleInstructorChange={handleInstructorChange}
+            handleRoomChange={handleRoomChange}
+            handleCourseChange={handleCourseChange}
+            clearFilters={clearFilters}
+            yearSemester={yearSemester}
           />
-          <ClassDetailsList displayData={displayData} title={activeFilter} />
+          <ClassDetailsList 
+            displayData={displayData} 
+            title={activeFilterText}
+            openClassModal={openClassModal}
+          />
         </Printable>
       </div>
       <Footer />

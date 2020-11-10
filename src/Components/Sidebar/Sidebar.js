@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import './sidebar.scss';
 import Select from 'react-select';
 import Modal from 'react-modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(props) {
   const [openClearCalendarModal, setOpenClearCalendarModal] = useState(false);
@@ -26,7 +30,7 @@ function Sidebar(props) {
           onClick={props.fileHandler}
           className="upload-btn"
         >
-          IMPORT CALENDAR FILE
+          LOAD CALENDAR FILE
         </button>
       </div>
       <div className="filters">
@@ -108,6 +112,35 @@ function Sidebar(props) {
         </div>
       </Modal>
       {/*** MODAL END **/}
+
+
+      {props.collisions.length > 0 &&
+        <div className="warningsLog">
+          <p className="warningsLogTitle">Overlapping Schedules</p>
+          <div className="warningsLogContainer">
+          {props.collisions.map(warning=>{
+            return (
+            <div className="warningMsg">            
+              <FontAwesomeIcon
+                icon={faExclamationTriangle}
+                className="warningIcon"
+                size="lg"
+              />
+              {warning[0].collisionAt[0].toUpperCase()+warning[0].collisionAt.substring(1)+": "} 
+              {warning[0][warning[0].collisionAt]}<br/>
+              Overlapping Times: 
+              {warning.map(item=>{
+                return (
+                  " "+item.meetingPattern+","
+                );
+              })}
+            </div>
+            );
+          })}
+          </div>
+        </div>
+      }
+
     </div>
   );
 }
