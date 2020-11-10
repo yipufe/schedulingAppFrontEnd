@@ -246,34 +246,55 @@ export default function AddClass(props) {
             <p className="left-section-label">Part of Term</p>
             <input type="text" name="block" onChange={handleAddClass} />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Campus</p>
+        </div>
+
+        <div className="add-class-center-section">
+          <div className="center-section-item">
+            <p className="center-section-label">Campus</p>
             <input type="text" name="campus" onChange={handleAddClass} />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Instruction Method</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Instruction Method</p>
             <input
               type="text"
               name="instructionMethod"
               onChange={handleAddClass}
             />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Visable</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Visable</p>
             <input type="text" name="visible" onChange={handleAddClass} />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Schedule Type</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Schedule Type</p>
             <input type="text" name="scheduleType" onChange={handleAddClass} />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Session</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Session</p>
             <input type="text" name="session" onChange={handleAddClass} />
+          </div>
+          <div className="center-section-item">
+            <h3>Instructor</h3>
+            <input
+              type="text"
+              placeholder="e.g. Hatch, Daniel (12345678)"
+              name="instructor"
+              onChange={handleAddClass}
+            />
+          </div>
+          <div className="center-section-item">
+            <h3>Building and Room</h3>
+            <input
+              type="text"
+              placeholder="e.g. CS 406"
+              name="location"
+              onChange={handleAddClass}
+            />
           </div>
         </div>
 
         <div className="add-class-right-section">
-          <div className="right-section-item">
+        <div className="right-section-item">
             <h3>Section Attributes</h3>
             <input
               type="text"
@@ -286,24 +307,6 @@ export default function AddClass(props) {
             <input
               type="text"
               name="courseAttributes"
-              onChange={handleAddClass}
-            />
-          </div>
-          <div className="right-section-item">
-            <h3>Instructor</h3>
-            <input
-              type="text"
-              placeholder="e.g. Hatch, Daniel (12345678)"
-              name="instructor"
-              onChange={handleAddClass}
-            />
-          </div>
-          <div className="right-section-item">
-            <h3>Building and Room</h3>
-            <input
-              type="text"
-              placeholder="e.g. CS 406"
-              name="location"
               onChange={handleAddClass}
             />
           </div>
