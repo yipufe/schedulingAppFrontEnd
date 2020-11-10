@@ -19,10 +19,10 @@ function ClassDetailsList(props) {
               <tr key={item.classId}>
                 <td className="classDetailsListItem">
                   <div className="classDetail">
-                    <span className="bold">Title:</span> {item.courseTitle}
+                    <span className="bold">Course:</span> {item.course}
                   </div>
                   <div className="classDetail">
-                    <span className="bold">Course:</span> {item.course}
+                    <span className="bold">Title:</span> {item.courseTitle}
                   </div>
                   <div className="classDetail">
                     <span className="bold">Instructor:</span> {item.instructor}
