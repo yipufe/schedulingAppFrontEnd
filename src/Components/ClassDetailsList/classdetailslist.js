@@ -25,10 +25,15 @@ function ClassDetailsList(props) {
               >
                 <td className="classDetailsListItem">
                   <div className="classDetail">
+                    <span className="bold">Course:</span> {item.course}
+                  </div>
+                  <div className="classDetail">
+
                     <span className="bold">Title:</span> {item.courseTitle}
                   </div>
                   <div className="classDetail">
                     <span className="bold">Course:</span> {item.course}-{item.section}
+
                   </div>
                   <div className="classDetail">
                     <span className="bold">Instructor:</span> {item.instructor}
