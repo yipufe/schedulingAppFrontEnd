@@ -42,10 +42,7 @@ function ClassModal(props) {
           <h3>Section Information</h3>
           <div className="left-section-item">
             <p className="left-section-label">Prefix & Number</p>
-            <input
-              type="text"
-              name="course"
-              onChange={props.changed}
+            <input type="text" name="course" onChange={props.changed}
               value={props.classModalData.course}
             />
           </div>
@@ -130,8 +127,10 @@ function ClassModal(props) {
               value={props.classModalData.campus}
             />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Instruction Method</p>
+        </div>  
+        <div className="add-class-center-section">
+          <div className="center-section-item">
+            <p className="center-section-label">Instruction Method</p>
             <input
               type="text"
               name="instructionMethod"
@@ -139,8 +138,8 @@ function ClassModal(props) {
               value={props.classModalData.instructionMethod}
             />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Visable</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Visable</p>
             <input
               type="text"
               name="visible"
@@ -148,8 +147,8 @@ function ClassModal(props) {
               value={props.classModalData.visible}
             />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Schedule Type</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Schedule Type</p>
             <input
               type="text"
               name="scheduleType"
@@ -157,13 +156,33 @@ function ClassModal(props) {
               value={props.classModalData.scheduleType}
             />
           </div>
-          <div className="left-section-item">
-            <p className="left-section-label">Session</p>
+          <div className="center-section-item">
+            <p className="center-section-label">Session</p>
             <input
               type="text"
               name="session"
               onChange={props.changed}
               value={props.classModalData.session}
+            />
+          </div>
+          <div className="center-section-item">
+            <h3>Instructor</h3>
+            <input
+              type="text"
+              placeholder="e.g. Hatch, Daniel (12345678)"
+              name="instructor"
+              onChange={props.changed}
+              value={props.classModalData.instructor}
+            />
+          </div>
+          <div className="center-section-item">
+            <h3>Building and Room</h3>
+            <input
+              type="text"
+              placeholder="e.g. CS 406"
+              name="location"
+              onChange={props.changed}
+              value={props.classModalData.location}
             />
           </div>
         </div>
@@ -185,26 +204,6 @@ function ClassModal(props) {
               name="courseAttributes"
               onChange={props.changed}
               value={props.classModalData.courseAttributes}
-            />
-          </div>
-          <div className="right-section-item">
-            <h3>Instructor</h3>
-            <input
-              type="text"
-              placeholder="e.g. Hatch, Daniel (12345678)"
-              name="instructor"
-              onChange={props.changed}
-              value={props.classModalData.instructor}
-            />
-          </div>
-          <div className="right-section-item">
-            <h3>Building and Room</h3>
-            <input
-              type="text"
-              placeholder="e.g. CS 406"
-              name="location"
-              onChange={props.changed}
-              value={props.classModalData.location}
             />
           </div>
           <div className="right-section-item">
