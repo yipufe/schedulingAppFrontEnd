@@ -97,6 +97,22 @@ function CalendarCells() {
       <div className="full-cal-cell"></div>
       <div className="full-cal-cell"></div>
       <div className="full-cal-cell"></div>
+
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
+      <div className="full-cal-cell"></div>
     </div>
   );
 }

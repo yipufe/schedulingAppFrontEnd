@@ -6,6 +6,7 @@ import './calendarTimes.scss';
 function CalendarTimes() {
   return (
     <div className="full-cal-times">
+      <div className="cal-time">6:00 am</div>
       <div className="cal-time">7:00 am</div>
       <div className="cal-time">8:00 am</div>
       <div className="cal-time">9:00 am</div>
@@ -21,6 +22,7 @@ function CalendarTimes() {
       <div className="cal-time">7:00 pm</div>
       <div className="cal-time">8:00 pm</div>
       <div className="cal-time">9:00 pm</div>
+      <div className="cal-time">10:00 pm</div>
     </div>
   );
 }
