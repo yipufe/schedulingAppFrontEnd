@@ -28,11 +28,15 @@ th {
     padding: 5px;
     display: flex;
     flex-wrap: wrap;
-    .classDetail {
+    .classDetail, .classCancelled {
         margin-right: 15px;
         .bold {
             font-weight: bold;
         }    
+    }
+    .classCancelled {
+        color: $red;
+        font-weight: bold;
     }
 }
 tr {
