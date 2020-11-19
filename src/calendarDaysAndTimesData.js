@@ -303,6 +303,11 @@ export const selectDays = [
   { value: 'MW', label: 'MW' },
   { value: 'MWF', label: 'MWF' },
   { value: 'TR', label: 'TR' },
+  { value: 'MTWR', label: 'MTWR' },
+  { value: 'MTWRF', label: 'MTWRF' },
+  { value: 'TWR', label: 'TWR' },
+  { value: 'MT', label: 'MT' },
+  { value: 'FSa', label: 'FSa' },
 ];
 
 //Times available for scheduling
