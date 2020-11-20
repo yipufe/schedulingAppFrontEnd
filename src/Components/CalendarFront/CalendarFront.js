@@ -59,7 +59,68 @@ function CalendarFront(props) {
   let tooltipIndex = 1000;
   let maxCalItems = 50; //Keeps the app from trying to process all of the data on load by limiting the number of items
 
-  //OVERLAP section
+
+  //OVERLAP original schedule
+  let overlap_origsch = [];
+  if(meetingPatternArrOriginal.length < maxCalItems) {  //Don't run if items exceeds maxCalItems
+  meetingPatternArrOriginal.forEach((calItem,i,calItemArr)=>{
+      const arrCopy = JSON.parse(JSON.stringify(calItemArr));
+      arrCopy.splice(i,1); //Remove calItem from array
+      const days = calItem.meetingPattern.split(' ')[0].split('');  //split meetingPattern days up
+      //Iterate through each day looking for overlap
+      days.forEach((day)=>{
+        const callItemCopy = JSON.parse(JSON.stringify(calItem));
+        callItemCopy.meetingPatternTemp = day+' '+callItemCopy.meetingPattern.split(' ')[1];
+        overlap_origsch.push( getOverlap([callItemCopy], arrCopy) )
+      })
+    })
+  }
+
+  overlap_origsch = overlap_origsch.filter(item=>item.length > 1);  //Remove non-overlapping
+
+  //Filters out duplicates
+  let overlapUnique_origsch = [];
+  overlap_origsch.forEach((item1,index1,arr)=>{
+    if(-1===overlapUnique_origsch.findIndex(item2=>{
+      return isSameOverlap(item1,item2);
+    })) {
+      overlapUnique_origsch.push(item1);
+    }
+  });
+  overlap_origsch = overlapUnique_origsch;
+
+  //Build meeting patterns for overlaping sets and reformat for later use
+  overlap_origsch = overlap_origsch.map(item=>{
+    //Get all times
+    let times = [];
+    let day = '';
+    item.forEach(calItem=>{
+      const [dayValue,timeSpan] = calItem.meetingPatternTemp.split(' ');
+      const [startTime,endTime] = timeSpan.split('-');
+      times.push(startTime);
+      times.push(endTime);
+      day = dayValue;
+    })
+    const startTime = getEarliestTime(times);
+    const endTime = getLatestTime(times);
+    return {day, startTime, endTime, items: item}
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //OVERLAP section, modified schedule
   let overlap = [];
   if(meetingPatternArr.length < maxCalItems) {  //Don't run if items exceeds maxCalItems
     meetingPatternArr.forEach((calItem,i,calItemArr)=>{
@@ -172,7 +233,66 @@ function CalendarFront(props) {
     return getOverlap(newItem, arrCopy);
   }
 
-  //overlap/collisions output for display
+
+
+
+
+
+
+const collisionsOutput_origsch = overlap_origsch.map((event, index) => {
+    return (
+      <ContainerCollision
+        style={{
+          gridColumn: `${calDaysLeft[event.day]}`,
+          gridRow: `${calTimes[event.startTime]} / ${calTimes[event.endTime]}`,
+        }}
+        >
+        {
+          event.items.map(cl=>{
+            tooltipIndex++;
+            return (
+              <div 
+                className="subclass"
+                data-tip
+                data-for={"tooltip_"+tooltipIndex}
+              >
+                <p className="cal-front-item-course">
+                  {cl.course}-{cl.section}
+                </p>
+                <p className="cal-front-item-p">
+                  {cl.courseTitle.substring(0, 8) + '...'}
+                </p>
+                <ReactTooltip delayShow={1000} id={"tooltip_"+tooltipIndex}>
+                  {cl.course}-{cl.section}
+                  <br />
+                  {cl.courseTitle}
+                  <br />
+                  {cl.instructor}
+                  <br />
+                  {cl.meetingPatternText}
+                </ReactTooltip>
+              </div>
+            );
+          })
+        }
+      </ContainerCollision>
+    );
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //overlap/collisions output for display, modified schedule
   const collisionsOutput = overlap.map((event, index) => {
     if(compareSchedule) {
       return (
@@ -441,7 +561,7 @@ function CalendarFront(props) {
 
 
     if(compareSchedule) {
-      return <div className="calendar-front compare">{eventData.concat(eventDataOriginal).concat(collisionsOutput)}</div>;
+      return <div className="calendar-front compare">{eventData.concat(eventDataOriginal).concat(collisionsOutput).concat(collisionsOutput_origsch)}</div>;
     } else {
       return <div className="calendar-front">{eventData.concat(collisionsOutput)}</div>;
     }

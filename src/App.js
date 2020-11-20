@@ -285,7 +285,7 @@ function App() {
                       creditHours: item.field27,
                       gradeMode: item.field28,
                       instructionMethod: item.field22,
-                      instructor: item.field16.split(' (')[0],
+                      instructor: item.field16.split('; ').map(instr=> instr.split(' (')[0] ).join('; '),
                       location: item.field17,
                       maxEnrollment: item.field33,
                       maxWaitlistEnrollment: item.field36,
@@ -438,19 +438,29 @@ function App() {
       }
       
       if (roomArray.length <= 0) {
-        const room = item.location.split(';')[0]; //Remove extra information after the semicolon
-        roomArray.push(room);
+        const rooms = item.location.split('; ');
+        rooms.forEach(room_item=>{
+          roomArray.push(room_item);
+        })
       }
-      if (!roomArray.includes(item.location)) {
-        const room = item.location.split(';')[0]; //Remove extra information after the semicolon
-        roomArray.push(room);
-      }
+      const rooms = item.location.split('; ');
+      rooms.forEach(room_item=>{
+        if (!roomArray.includes(room_item)) {
+          roomArray.push(room_item);
+        }
+      })
       if (instructorArray.length <= 0) {
-        instructorArray.push(item.instructor);
+        const instructors = item.instructor.split('; ');
+        instructors.forEach(instr=>{
+          instructorArray.push(instr);
+        })
       }
-      if (!instructorArray.includes(item.instructor)) {
-        instructorArray.push(item.instructor);
-      }
+      const instructors = item.instructor.split('; ');
+      instructors.forEach(instr=>{
+        if (!instructorArray.includes(instr)) {
+          instructorArray.push(instr);
+        }
+      })
       if (blockArray.length <= 0) {
         blockArray.push(item.block);
       }
@@ -607,10 +617,20 @@ function App() {
   const handleInstructorChange = (selectedOption) => {
     console.log(`Option selected:`, selectedOption);
     const instructorFilteredData = initialAndChangedData.filter(
-      (item) => item.instructor === selectedOption.value
+      (item) => {
+        const instructors = item.instructor.split('; ');
+        return instructors.some(instr=>{
+          return instr === selectedOption.value;
+        }) 
+      }
     );
     const instructorFilteredInitialData = initialData.filter(
-      (item) => item.instructor === selectedOption.value
+      (item) => {
+        const instructors = item.instructor.split('; ');
+        return instructors.some(instr=>{
+          return instr === selectedOption.value;
+        }) 
+      }
     );
     
     setInitialDataFiltered(instructorFilteredInitialData);
@@ -629,14 +649,21 @@ function App() {
         item.location will be the room number and may include details after such
         as "CS 406; Online Online"
         This will select all items that have the same room number in the front of the string*/
-      return item.location.split(';')[0] === selectedOption.value;
+
+      const rooms = item.location.split('; ');
+      return rooms.some(room_item=>{
+        return room_item === selectedOption.value;
+      })
     });
     const roomFilteredInitialData = initialData.filter((item) => {
       /* SelectedOption.value will be only the room number such as "CS 406" and
         item.location will be the room number and may include details after such
         as "CS 406; Online Online"
         This will select all items that have the same room number in the front of the string*/
-      return item.location.split(';')[0] === selectedOption.value;
+      const rooms = item.location.split('; ');
+      return rooms.some(room_item=>{
+        return room_item === selectedOption.value;
+      })
     });
     setInitialDataFiltered(roomFilteredInitialData);
     setDisplayData(roomFilteredData);
