@@ -39,6 +39,7 @@ function App() {
   const [classModalData, setClassModalData] = useState({});
   const [uniqueId, setUniqueId] = useState(0);
   const [yearSemester, setYearSemester] = useState('');
+  const [showCalendar, setShowCalendar] = useState(true);
 
   //Sets meetingPattern in classModalData to new meeting pattern as defined in pattern
   function changeClassModalMeetingPattern(pattern) {
@@ -748,11 +749,13 @@ function App() {
           collisions={collisions}
         />
         <Printable ref={componentRef}>
-          <div className="printOnly">
-            <div className="calTitleContainer">
-              <div className="calTitle bold">{activeFilterText}</div>
+          {showCalendar && 
+            <div className="printOnly">
+              <div className="calTitleContainer">
+                <div className="calTitle bold">{activeFilterText}</div>
+              </div>
             </div>
-          </div>
+          }
           <Calendar
             // These are all the props being sent to the Calendar component
             initialData={initialData}
@@ -775,6 +778,7 @@ function App() {
             handleCourseChange={handleCourseChange}
             clearFilters={clearFilters}
             yearSemester={yearSemester}
+            setShowCalendar={setShowCalendar}
           />
           <ClassDetailsList 
             displayData={displayData} 

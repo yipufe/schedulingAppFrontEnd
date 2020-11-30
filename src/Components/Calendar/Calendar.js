@@ -39,7 +39,7 @@ function Calendar(props) {
     );
   }
   let showCalendar = !(filteredDisplayData.length===0 && props.displayData.length>0) && props.displayData.length<displayCap;
-
+  props.setShowCalendar(showCalendar);
   //Hide calendar if room is of a certain type
   if(props.activeFilter.filter === 'Room') {
     if(props.activeFilter.options.value === 'ONLINE ONLINE' ||
@@ -59,7 +59,8 @@ function Calendar(props) {
 
   return (
     <div className="calendar-wrap">
-      <div className="calendar-title">{props.yearSemester}</div>
+      {showCalendar ? <div className="calendar-title">{props.yearSemester}</div> : <div className="noPrint"><div className="calendar-title">{props.yearSemester}</div></div>}
+      
       <section className="calendar-header">
       {compareSchedule&&
         <div className="comparison-legend">
