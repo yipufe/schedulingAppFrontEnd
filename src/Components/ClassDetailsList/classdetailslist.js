@@ -24,6 +24,11 @@ function ClassDetailsList(props) {
                 }}
               >
                 <td className="classDetailsListItem">
+                  
+                  {item.status === 'Cancelled' && 
+                    <div className="classCancelled">Cancelled</div>
+                  }
+
                   <div className="classDetail">
                     <span className="bold">Title:</span> {item.courseTitle}
                   </div>
