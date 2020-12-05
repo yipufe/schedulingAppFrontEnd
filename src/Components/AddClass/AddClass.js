@@ -169,7 +169,9 @@ export default function AddClass(props) {
   //final error check
   const checkConflicts = () => {
     let conflict = false
-    let newLocation = addClassData.location.split(' ').join('').toLowerCase()
+    let building = addClassData.building.toLowerCase()
+    let room = addClassData.room.toLowerCase()
+    let newLocation = building.concat(room) //concat the building and room
     let filterNewSemi = newLocation.split(';')
     let filterNewLocation = filterNewSemi[0]
 
@@ -298,14 +300,32 @@ export default function AddClass(props) {
             />
           </div>
           <div className="right-section-item">
-            <h3>Building and Room</h3>
-            <input
-              type="text"
-              placeholder="e.g. CS 406"
-              name="location"
-              onChange={handleAddClass}
-            />
+            <h3>Location</h3>
+            <div className="enrollment-section">
+              <label htmlFor="building">
+                Building
+                <input
+                  type="text"
+                  id="building"
+                  name="building"
+                  placeholder="e.g. CS"
+                  onChange={handleAddClass}
+                />
+              </label>
+              <label htmlFor="room">
+                Room
+                <input
+                  type="text"
+                  id="room"
+                  name="room"
+                  placeholder="e.g. 409"
+                  onChange={handleAddClass}
+                />
+              </label>
+            </div>
+
           </div>
+
           <div className="right-section-item">
             <h3>Schedule</h3>
             <div className="schedule-selects">
@@ -406,7 +426,7 @@ export default function AddClass(props) {
             })
             
             console.log("Has Values:", hasValues, valueCount, "ClassData:", addClassData);
-            if (hasValues&&valueCount===fieldsCount) {  //if (Object.keys(addClassData).length === 23) {
+            if (hasValues&&valueCount===fieldsCount) {  //if (Object.keys(addClassData).length === 23) { 
               if (checkConflicts()){
                 //Give new class a unique ID
                 addClassData.classId = 'ID'+uniqueId;
