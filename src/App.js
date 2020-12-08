@@ -439,6 +439,9 @@ function App() {
       }
       
       if (roomArray.length <= 0) {
+        if(item.location===undefined) {
+          item.location = item.building.concat(' ', item.room);
+        }
         const room = item.location.split(';')[0]; //Remove extra information after the semicolon
         roomArray.push(room);
       }

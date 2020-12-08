@@ -407,7 +407,7 @@ export default function AddClass(props) {
           onClick={() => {
             let hasValues=true;
             let valueCount=0;
-            const fieldsCount = 24; //Number of values in the modal
+            const fieldsCount = 25; //Number of values in the modal
             
             if(scheduleDay !== '' && scheduleStartTime !== '' && scheduleEndTime !== '') {
               addClassData.meetingPattern = scheduleDay+' '+scheduleStartTime+'-'+scheduleEndTime;
